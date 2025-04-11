@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  cortado-db:
+    image: postgres:latest
+    container_name: cortado-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: Cortado.App.Db
+    ports:
+      - "54321:5432"
+
+  cortado-api:
+    build:
+      context: .
+      dockerfile: Cortado.API/Dockerfile
+    ports:
+      - "5000:8080"

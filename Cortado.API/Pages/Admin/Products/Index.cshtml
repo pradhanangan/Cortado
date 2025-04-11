@@ -1,0 +1,62 @@
+﻿@page
+@model Cortado.API.Pages.Admin.Products.IndexModel
+@{
+}
+<h5>Products</h5>
+<br />
+<a href="/Admin/Products/Create">Create</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Code
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Start date
+            </th>
+            <th>
+                End date
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model.Products != null && Model.Products.Any()) {
+            foreach (var item in Model.Products)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Code)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndDate)
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
+                        
+                    </td>
+                </tr>
+            }
+        } else {
+            <tr>
+                <td colspan="6">No records found.</td>
+            </tr>
+
+        }
+    </tbody>
+</table>

@@ -1,0 +1,115 @@
+﻿@page
+@model Cortado.API.Pages.Admin.Products.EditModel
+@{
+}
+
+<h5>Products > Edit</h5>
+<br />
+<form method="post">
+    <div class="row">
+        <div class="col-md-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Product.Id" />
+            <div class="form-group">
+                <label asp-for="Product.Code" class="form-label"></label>
+                <input asp-for="Product.Code" class="form-control" readonly />
+                <span asp-validation-for="Product.Code" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Product.Name" class="form-label"></label>
+                <input asp-for="Product.Name" class="form-control" readonly />
+                <span asp-validation-for="Product.Name" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label asp-for="Product.Description" class="form-label"></label>
+                <textarea asp-for="Product.Description" class="form-control" readonly></textarea>
+                <span asp-validation-for="Product.Description" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Product.StartDate" class="form-label"></label>
+                <input asp-for="Product.StartDate" type="date" class="form-control" readonly />
+                <span asp-validation-for="Product.StartDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Product.EndDate" class="form-label"></label>
+                <input asp-for="Product.EndDate" type="date" class="form-control" readonly />
+                <span asp-validation-for="Product.EndDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @* <div class="form-group mt-2">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div> *@
+    </div>
+</form>
+<br/>
+<br/>
+<h5>Product Items</h5>
+<a asp-page="/Admin/ProductItems/Create" asp-route-productId="@Model.Product.Id">Create</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Variants
+            </th>
+            <th>
+                UnitPrice
+            </th>
+            @* <th></th> *@
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Product.ProductItems != null && Model.Product.ProductItems.Any())
+        {
+            foreach (var item in Model.Product.ProductItems)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Variants)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UnitPrice)
+                    </td>
+                    @* <td>
+                        <a asp-page="/Admin/ProductItems/Edit" asp-route-id="@item.Id" asp-route-productId="@Model.Product.Id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    </td> *@
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">No records found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>

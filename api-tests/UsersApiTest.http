@@ -1,0 +1,26 @@
+@hostname=localhost
+@port=7279
+
+POST https://{{hostname}}:{{port}}/api/Users/addUser
+Content-Type: application/json
+
+{
+  "identityId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "username": "nripendra.p@gmail.com",
+  "email": "nripendra.p@gmail.com"
+}
+
+###
+
+POST https://{{hostname}}:{{port}}/api/users/adduserasmember
+Content-Type: application/json
+
+{
+  "userId": 2,
+  "memberId": 1
+}
+
+###
+GET https://{{hostname}}:{{port}}/api/identities/3fa85f64-5717-4562-b3fc-2c963f66afa6/member
+
+

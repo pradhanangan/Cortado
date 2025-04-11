@@ -1,0 +1,74 @@
+﻿@page
+@model Cortado.API.Pages.Admin.Orders.IndexModel
+@{
+}
+<h5>Orders</h5>
+<br />
+<form method="get">
+    <label for="productCode">Product code:</label>
+    <input type="text" name="productCode" value="@Model.ProductCode" placeholder="Search product code..." class="form-control" />
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Email
+            </th>
+            @* <th>
+                Phone number
+            </th> *@
+            <th>
+                Num Tickets
+            </th>
+            <th>
+                Order date
+            </th>
+            <th>
+                Verified
+            </th>
+            <th>
+                Paid
+            </th>
+            <th>
+                Confirmed
+            </th>
+            <th>Tickets</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Orders)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                @* <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td> *@
+                
+                <td>
+                   @Html.DisplayFor(modelItem => item.TotalNumberOfTickets)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsEmailVerified)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsPaid)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsConfirmed)
+                </td>
+                <td>@* @(item.Tickets != null && item.Tickets.Any() ? "Yes" : "No") *@</td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

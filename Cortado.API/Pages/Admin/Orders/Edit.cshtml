@@ -1,0 +1,142 @@
+﻿@page
+@model Cortado.API.Pages.Admin.Orders.EditModel
+@{
+}
+
+<h5>Orders > Edit</h5>
+<div class="row">
+        <div class="col-md-4">
+        Order Id: @Model.Order.Id
+        
+        </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        Product Id: @Model.Order.ProductId
+
+    </div>
+</div>
+<div class="row">
+    <form method="post">
+        <div class="col-md-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Order.Id" />
+            <input type="hidden" asp-for="Order.ProductId"/>
+            <div class="form-group">
+                <label asp-for="Order.Email" class="form-label"></label>
+                <input asp-for="Order.Email" class="form-control" />
+                <span asp-validation-for="Order.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.PhoneNumber" class="form-label"></label>
+                <input asp-for="Order.PhoneNumber" class="form-control" />
+                <span asp-validation-for="Order.PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-check">
+                    <input asp-for="Order.IsEmailVerified" class="form-check-input" type="checkbox" />
+                    <label asp-for="Order.IsEmailVerified" class="form-check-label"></label>
+                </div>
+                <span asp-validation-for="Order.IsEmailVerified" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-check">
+                    <input asp-for="Order.IsPaid" class="form-check-input" type="checkbox" />
+                    <label asp-for="Order.IsPaid" class="form-check-label"></label>
+                </div>
+                <span asp-validation-for="Order.IsPaid" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-check">
+                    <input asp-for="Order.IsConfirmed" class="form-check-input" type="checkbox" />
+                    <label asp-for="Order.IsConfirmed" class="form-check-label"></label>
+                </div>
+                <span asp-validation-for="Order.IsConfirmed" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.OrderDate" class="form-label"></label>
+                <input asp-for="Order.OrderDate" class="form-control" />
+                <span asp-validation-for="Order.OrderDate" class="text-danger"></span>
+            </div>
+            
+            
+        </div>
+        <div class="form-group mt-2">
+            <input type="submit" disabled="@(Model.Order.IsPaid && Model.Order.IsEmailVerified && Model.Order.IsConfirmed)" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+<h5>Order Items</h5>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Product Item Id
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Price
+            </th>
+            @* <th></th> *@
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Order.OrderItems != null)
+        {
+            foreach (var item in Model.Order.OrderItems)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductItemId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    @* <td>
+                        <a asp-page="/Admin/ProductItems/Edit" asp-route-id="@item.Id" asp-route-productId="@Model.Product.Id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    </td> *@
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div>
+    <form asp-page-handler="GenerateTickets" method="post">
+        <input type="hidden" asp-for="Order.Id" />
+        @* <input type="hidden" asp-for="@Model.Booking.NumAdults" />
+        <input type="hidden" asp-for="@Model.Booking.NumKids" />
+         *@<button type="submit" class="btn btn-primary" disabled="@(Model.Tickets != null && Model.Tickets.Any() ||!(Model.Order.IsPaid && Model.Order.IsEmailVerified && Model.Order.IsConfirmed))">Generate Ticket(s)</button>
+        @* <button type="submit" class="btn btn-primary" disabled="@(Model.Booking.Tickets != null && Model.Booking.Tickets.Any() || !(Model.Booking.IsPaid && Model.Booking.IsEmailVerified && Model.Booking.IsConfirmed))">Generate Ticket(s)</button> *@
+        @* <button type="submit" class="btn btn-primary" @((Model.Booking.Tickets != null && Model.Booking.Tickets.Any() ? "disabled" : Model.Booking.IsPaid && Model.Booking.IsEmailVerified && Model.Booking.IsConfirmed ? "": "disabled"))> Generate Ticket(s)</button> *@
+    </form>
+</div>
+
+@if (Model.Tickets != null)
+{
+    foreach (var item in Model.Tickets)
+    {
+        <div>
+            <dl class="row">
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => item.TicketNumber)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => item.TicketNumber)
+                </dd>
+
+            </dl>
+        </div>
+    }
+}
+<div>
+    <a asp-page="./Index" asp-route-productCode="@Model.Product.Code">Back to List</a>
+</div>

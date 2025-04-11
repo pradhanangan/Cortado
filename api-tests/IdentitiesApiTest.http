@@ -1,0 +1,29 @@
+@hostname=localhost
+@port=7279
+
+POST https://{{hostname}}:{{port}}/api/Identities/signUp
+Content-Type: application/json
+
+{
+  "email": "nripendra.pradhananga@gmail.com",
+  "password": "Password.1#"
+}
+
+###
+POST https://{{hostname}}:{{port}}/api/Identities/confirmSignUp
+Content-Type: application/json
+
+{
+  "email": "nripendra.pradhananga@gmail.com",
+  "confirmationCode": "045978"
+}
+
+###
+###
+POST https://{{hostname}}:{{port}}/api/Identities/signIn
+Content-Type: application/json
+
+{
+  "email": "nripendra.pradhananga@gmail.com",
+  "password": "Password.1#"
+}

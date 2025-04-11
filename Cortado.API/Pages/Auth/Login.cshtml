@@ -1,0 +1,66 @@
+﻿@page
+@model Cortado.API.Pages.Auth.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* height: 100vh; */
+        /* background-color: #f8f9fa; /* Optional: Light background */ */
+    }
+
+    .login-form {
+        width: 300px;
+        padding: 20px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-form h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .login-form .form-group {
+        margin-bottom: 15px;
+    }
+
+    .login-form .btn {
+        width: 100%;
+    }
+
+    .login-form .alert {
+        margin-top: 15px;
+    }
+</style>
+
+<div class="login-container">
+
+
+<form method="post" class="login-form">
+        <h2>Login</h2>
+    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+    <div class="form-group">
+        <label for="Username">Username</label>
+        <input type="text" class="form-control" id="Username" name="Username" value="@Model.Input.Username" required />
+    </div>
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <input type="password" class="form-control" id="Password" name="Password" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger mt-3">@Model.ErrorMessage</div>
+    }
+</form>
+</div>
+<div>Username: admin@ristretto.com</div>
+<div>Password: Password.1#</div>
+

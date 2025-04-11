@@ -1,0 +1,112 @@
+@hostname=localhost
+@port=7279
+
+GET https://{{hostname}}:{{port}}/api/members
+
+###
+
+GET https://{{hostname}}:{{port}}/api/Members/1
+
+###
+
+POST https://{{hostname}}:{{port}}/api/Members
+Content-Type: application/json
+
+{
+  "title":"MR",
+  "firstName": "John",
+  "middleName": "M",
+  "lastName": "Doe",
+  "email": "john@doe.com",
+  "phone": "0211234567",
+  "gender": "M",
+  "birthDate": "2023-01-01"
+}
+
+###
+
+PUT https://{{hostname}}:{{port}}/api/Members/2
+Content-Type: application/json
+
+{
+  "id": 2
+  "firstName": "John",
+  "middleName": "Middle",
+  "lastName": "Doe",
+  "email": "john@doe.com",
+  "phone": "0211234567"
+}
+
+###
+
+DELETE https://{{hostname}}:{{port}}/api/members/2
+
+###
+
+POST https://{{hostname}}:{{port}}/api/members/1/memberships
+Content-Type: application/json
+
+{
+  "memberId": 1,
+  "startDate": "2023-01-01",
+  "endDate": "2024-01-01"
+}
+
+###
+
+GET https://{{hostname}}:{{port}}/api/members/1/memberships/summary
+
+###
+
+GET https://{{hostname}}:{{port}}/api/members/1/memberships
+
+###
+DELETE https://{{hostname}}:{{port}}/api/members/1/memberships/3
+
+###
+
+POST https://{{hostname}}:{{port}}/api/members/1/addresses
+Content-Type: application/json
+
+{
+  "memberId": 1,
+  "buildingName": "",
+  "streetAddress": "52 Berkley Avenue",
+  "additionalStreetAddress": "",
+  "suburb": "Silverdale",
+  "townOrCity": "Hamilton",
+  "postCode": "3216",
+  "country": "NZ",
+  "isPrimary": true
+}
+
+###
+GET https://{{hostname}}:{{port}}/api/members/1/addresses
+
+###
+DELETE https://{{hostname}}:{{port}}/api/members/1/addresses/5
+
+###
+
+GET https://{{hostname}}:{{port}}/api/activities
+
+###
+POST https://{{hostname}}:{{port}}/api/activities
+Content-Type: application/json
+
+{
+  "code": "YOGA-2023",
+  "description": "Yoga class 2023",
+  "startDate": "2023-01-01",
+  "endDate": "2024-01-01"
+}
+
+###
+POST https://{{hostname}}:{{port}}/api/members/1/registrations
+Content-Type: application/json
+
+{
+  "memberId": 1,
+  "activityId": 1,
+  "registrationDate": "2023-01-01"
+}
