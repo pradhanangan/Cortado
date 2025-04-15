@@ -11,42 +11,50 @@ namespace Cortado.API.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/products")]
     [ApiController]
-    public class ProductsController : ApiControllerBase
+    public class ProductsController: ApiControllerBase<ProductsController>
     {
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IEnumerable<ProductDto>> Get()
+        public async Task<ActionResult<IEnumerable<ProductDto>>> Get()
         {
-            return await Mediator.Send(new GetProductsQuery());
+            var products = await Mediator.Send(new GetProductsQuery());
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
-        public async Task<ProductDto> Get(Guid id)
+        public async Task<ActionResult<ProductDto>> Get(Guid id)
         {
            return await Mediator.Send(new GetProductByIdQuery(id));
         }
 
         [HttpGet("code")]
-        public async Task<ProductDto> GetProductByCode([FromQuery] string code)
+        public async Task<ActionResult<ProductDto>> GetProductByCode([FromQuery] string code)
         {
             return await Mediator.Send(new GetProductByCodeQuery(code));
         }
 
         [HttpPost]
-        public async Task<Guid> Post(CreateProductRequest request)
+        public async Task<ActionResult<Guid>> Post(CreateProductRequest request)
         {
-            return await Mediator.Send(new CreateProductCommand(
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+            var productId = await Mediator.Send(new CreateProductCommand(
+                customerId.Value,
                 request.Code,
                 request.Name,
                 request.Description,
                 request.StartDate,
                 request.EndDate
             ));
+            return CreatedAtAction(nameof(Post), productId);
         }
 
         [HttpPost]
         [Route("/api/products/{productId:guid}/product-items")]
-        public async Task<Guid> CreateProductItem(Guid productId, CreateProductItemRequest request)
+        public async Task<ActionResult<Guid>> CreateProductItem(Guid productId, CreateProductItemRequest request)
         {
             return await Mediator.Send(new CreateProductItemCommand(
                 request.ProductId,

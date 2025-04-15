@@ -65,6 +65,7 @@ builder.Services.AddAuthentication(options =>
     })
      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
      {
+         options.MapInboundClaims = false;
          options.TokenValidationParameters = new TokenValidationParameters
          {
              IssuerSigningKeyResolver = (s, securityToken, identifier, parameters) =>
@@ -84,6 +85,7 @@ builder.Services.AddAuthentication(options =>
              ValidateIssuerSigningKey = true,
              ValidIssuer = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo",
              RoleClaimType = "cognito:groups",
+             //NameClaimType ="sub"
              //ValidAudience = "7qin2t9mgeicjmtpe3lcv0ae9s"     // Cognito App Client Id
              //AudienceValidator = (audiences, securityToken, validationParameters) =>
              //{

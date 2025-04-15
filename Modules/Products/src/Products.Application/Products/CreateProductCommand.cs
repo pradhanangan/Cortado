@@ -4,7 +4,7 @@ using Products.Domain.Entities;
 
 namespace Products.Application.Products;
 
-public sealed record CreateProductCommand(string Code, string Name, string Description, DateOnly StartDate, DateOnly EndDate) : IRequest<Guid>;
+public sealed record CreateProductCommand(Guid CustomerId, string Code, string Name, string Description, DateOnly StartDate, DateOnly EndDate) : IRequest<Guid>;
 
 public class CreateProductCommandHandler(IProductDbContext dbContext) : IRequestHandler<CreateProductCommand, Guid>
 {
@@ -13,6 +13,7 @@ public class CreateProductCommandHandler(IProductDbContext dbContext) : IRequest
     {
         var product = new Product {
             Id = Guid.NewGuid(),
+            CustomerId = request.CustomerId,
             Code = request.Code, 
             Name = request.Name, 
             Description = request.Description,

@@ -111,6 +111,7 @@ namespace Cortado.API.Pages.Auth
                     {
                         new Claim(ClaimTypes.Name, Input.Username),
                         new Claim(ClaimTypes.Email, Input.Username),
+
                         new Claim("sub", sub),
                         new Claim("IdToken", idToken),
                         new Claim("AccessToken", accessToken)

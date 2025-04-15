@@ -8,7 +8,7 @@ namespace Cortado.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PaymentsController : ApiControllerBase
+    public class PaymentsController : ApiControllerBase<PaymentsController>
     {
         private readonly IStripePaymentService _stripePaymentService;
 

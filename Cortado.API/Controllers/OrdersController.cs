@@ -7,7 +7,7 @@ namespace Cortado.API.Controllers;
 
 [Route("api/orders")]
 [ApiController]
-public class OrdersController : ApiControllerBase
+public class OrdersController : ApiControllerBase<OrdersController>
 {
     [HttpGet("{id}")]
     public async Task<OrderDto> Get(Guid id)

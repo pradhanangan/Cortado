@@ -6,7 +6,7 @@ namespace Cortado.API.Controllers
 {
     [Route("api/tickets")]
     [ApiController]
-    public class TicketsController : ApiControllerBase
+    public class TicketsController : ApiControllerBase<TicketsController>
     {
         //public async Task<IEnumerable<TicketDto>> Get()
         //{

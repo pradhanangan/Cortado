@@ -1,6 +1,18 @@
-version: "3.8"
 services:
-  cortado-db:
+  cortado.api:
+    image: ${DOCKER_REGISTRY-}cortadoapi
+    build:
+      context: .
+      dockerfile: Cortado.API/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=cortado.db;Port=5432;Username=postgres;Password=postgres;Database=Cortado.App.Db
+    depends_on:
+      - cortado.db
+  
+  cortado.db:
     image: postgres:latest
     container_name: cortado-db
     environment:
@@ -9,10 +21,7 @@ services:
       POSTGRES_DB: Cortado.App.Db
     ports:
       - "54321:5432"
-
-  cortado-api:
-    build:
-      context: .
-      dockerfile: Cortado.API/Dockerfile
-    ports:
-      - "5000:8080"
+    volumes:
+      - C:/temp/postgres-data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+  

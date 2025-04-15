@@ -9,3 +9,7 @@ CREATE TABLE customers (
     last_modified_date timestamp with time zone,
     CONSTRAINT pk_customers PRIMARY KEY (id)
 );
+
+INSERT INTO customers (
+	id, username, email, identity_id, created_by, created_date, last_modified_by, last_modified_date)
+	VALUES (gen_random_uuid(), 'admin@ristretto.com', 'admin@ristretto.com', '1df3085c-de4c-4989-bc5f-2544bd4b9aa6', 'system', NOW(), 'system', NOW());

@@ -1,3 +1,4 @@
+using Customers.Application.Customers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Products.Application.Products;
 namespace Cortado.API.Pages.Admin.Products;
 
 [Authorize]
-public class CreateModel(ISender mediator) : PageModel
+public class CreateModel(ISender mediator) : PageModelBase<CreateModel>
 {
     [BindProperty]
     public string Code { get; set; } = string.Empty;
@@ -33,7 +34,16 @@ public class CreateModel(ISender mediator) : PageModel
             return Page();
         }
 
+        // Retrieve the authenticated customer ID
+        var customerId = await GetCustomerIdAsync();
+        if (customerId == null)
+        {
+            // Handle the case where the customer ID is not found
+            return Unauthorized();
+        }
+       
         await mediator.Send(new CreateProductCommand(
+            customerId.Value,
             Code,
             Name,
             Description,
