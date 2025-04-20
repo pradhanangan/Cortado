@@ -21,11 +21,16 @@ public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOr
         {
             using var transaction = await bookingsDbContext.BeginTransactionAsync(cancellationToken);
 
-            var product = await mediatr.Send(new GetProductByIdQuery(request.ProductId));
-            if (product is null)
+            var productResult = await mediatr.Send(new GetProductByIdQuery(request.ProductId));
+            if (productResult.IsFailure)
             {
                 throw new NotFoundException(nameof(Product), request.ProductId);
             }
+            //if (product is null)
+            //{
+            //    throw new NotFoundException(nameof(Product), request.ProductId);
+            //}
+            var product = productResult.Value;
 
             // Generate order number
             var orderNumberSequence = await orderRepository.GetNextOrderNumberAsync();

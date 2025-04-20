@@ -1,8 +1,6 @@
-using Customers.Application.Customers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Products.Application.Products;
 
 namespace Cortado.API.Pages.Admin.Products;
@@ -17,9 +15,17 @@ public class CreateModel(ISender mediator) : PageModelBase<CreateModel>
     [BindProperty] 
     public string Description { get; set; } = string.Empty;
     [BindProperty]
+    public string Address { get; set; } = string.Empty;
+    [BindProperty]
     public DateOnly StartDate { get; set; }
     [BindProperty]
     public DateOnly EndDate { get; set; }
+    [BindProperty]
+    public TimeOnly StartTime { get; set; }
+    [BindProperty]
+    public TimeOnly EndTime { get; set; }
+    [BindProperty]
+    public IFormFile? Image { get; set; } // Bind the uploaded file
 
     public void OnGet()
     {
@@ -41,14 +47,25 @@ public class CreateModel(ISender mediator) : PageModelBase<CreateModel>
             // Handle the case where the customer ID is not found
             return Unauthorized();
         }
-       
+
+        // Convert the file to a byte array or stream (if needed)
+        using var memoryStream = new MemoryStream();
+        await Image.CopyToAsync(memoryStream);
+
+        
+
         await mediator.Send(new CreateProductCommand(
             customerId.Value,
             Code,
             Name,
             Description,
+            memoryStream,
+            Image.FileName,
+            Address,
             StartDate,
-            EndDate
+            EndDate,
+            StartTime,
+            EndTime
         ));
         return RedirectToPage("./Index");
     }

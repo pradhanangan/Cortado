@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Products.Application.Products;
-using Products.Application.ProductItems;
-using Products.Application.Products.Dtos;
-using Cortado.API.Contracts;
-using Microsoft.AspNetCore.Authorization;
+﻿using Cortado.API.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Products.Application.ProductItems;
+using Products.Application.Products;
+using Products.Application.Products.Dtos;
 
 namespace Cortado.API.Controllers
 {
@@ -24,13 +24,15 @@ namespace Cortado.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> Get(Guid id)
         {
-           return await Mediator.Send(new GetProductByIdQuery(id));
+           var result = await Mediator.Send(new GetProductByIdQuery(id));
+           return result.Value;
         }
 
         [HttpGet("code")]
         public async Task<ActionResult<ProductDto>> GetProductByCode([FromQuery] string code)
         {
-            return await Mediator.Send(new GetProductByCodeQuery(code));
+            var result = await Mediator.Send(new GetProductByCodeQuery(code));
+            return result.Value;
         }
 
         [HttpPost]
@@ -41,13 +43,20 @@ namespace Cortado.API.Controllers
             {
                 return Unauthorized("Customer not found.");
             }
+            
+            using var imgStream = request.Image.OpenReadStream();
             var productId = await Mediator.Send(new CreateProductCommand(
                 customerId.Value,
                 request.Code,
                 request.Name,
                 request.Description,
+                imgStream,
+                request.Image.FileName,
+                request.Address,
                 request.StartDate,
-                request.EndDate
+                request.EndDate,
+                request.StartTime,
+                request.EndTime
             ));
             return CreatedAtAction(nameof(Post), productId);
         }
@@ -56,13 +65,14 @@ namespace Cortado.API.Controllers
         [Route("/api/products/{productId:guid}/product-items")]
         public async Task<ActionResult<Guid>> CreateProductItem(Guid productId, CreateProductItemRequest request)
         {
-            return await Mediator.Send(new CreateProductItemCommand(
+            var result = await Mediator.Send(new CreateProductItemCommand(
                 request.ProductId,
                 request.Name,
                 request.Description,
                 request.Variants,
                 request.UnitPrice
             ));
+            return result.Value;
         }
     }
 }

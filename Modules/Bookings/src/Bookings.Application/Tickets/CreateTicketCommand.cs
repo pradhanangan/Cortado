@@ -23,8 +23,14 @@ public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQr
             throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
-        var product = await medaitr.Send(new GetProductByIdQuery(order.ProductId));
-        
+        var productResult = await medaitr.Send(new GetProductByIdQuery(order.ProductId));
+        if(productResult.IsFailure)
+        {
+            throw new NotFoundException("Product", order.ProductId);
+        }
+
+        var product = productResult.Value;
+
         using var transaction = await bookingDbContext.BeginTransactionAsync(cancellationToken);
         var tickets = new List<Ticket>();
 

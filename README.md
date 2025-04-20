@@ -125,3 +125,7 @@ public GetMembersQueryHandler(ILogger<GetMembersQueryHandler> logger)
 **Access Seq**
 
 1. Type `http://localhost:5342`, ports are mapped in docker-compose.
+
+
+### Patterns
+Result Type/Pattern

@@ -5,14 +5,15 @@ using Products.Application.Common.Exceptions;
 using Products.Application.Common.Interfaces;
 using Products.Application.Products.Dtos;
 using Products.Domain.Entities;
+using Shared.Common.Abstraction;
 
 namespace Products.Application.Products;
 
-public record GetProductByCodeQuery(string Code) : IRequest<ProductDto>;
+public record GetProductByCodeQuery(string Code) : IRequest<Result<ProductDto>>;
 
-public class GetProductByCodeQueryHandler(IProductDbContext dbContext) : IRequestHandler<GetProductByCodeQuery, ProductDto>
+public class GetProductByCodeQueryHandler(IProductDbContext dbContext) : IRequestHandler<GetProductByCodeQuery, Result<ProductDto>>
 {
-    public async Task<ProductDto> Handle(GetProductByCodeQuery request, CancellationToken cancellationToken)
+    public async Task<Result<ProductDto>> Handle(GetProductByCodeQuery request, CancellationToken cancellationToken)
     {
         var product = await dbContext.Set<Product>()
            .Include(p => p.ProductItems)

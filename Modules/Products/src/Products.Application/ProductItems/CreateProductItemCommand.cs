@@ -3,14 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Products.Application.Common.Exceptions;
 using Products.Application.Common.Interfaces;
 using Products.Domain.Entities;
+using Shared.Common.Abstraction;
 
 namespace Products.Application.ProductItems;
 
-public sealed record CreateProductItemCommand(Guid ProductId, string Name, string Description, string Variants, decimal UnitPrice) : IRequest<Guid>;
+public sealed record CreateProductItemCommand(Guid ProductId, string Name, string Description, string Variants, decimal UnitPrice) : IRequest<Result<Guid>>;
 
-public class CreateProductItemCommandHandler(IProductDbContext dbContext) : IRequestHandler<CreateProductItemCommand, Guid>
+public class CreateProductItemCommandHandler(IProductDbContext dbContext) : IRequestHandler<CreateProductItemCommand, Result<Guid>>
 {
-    public async Task<Guid> Handle(CreateProductItemCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateProductItemCommand request, CancellationToken cancellationToken)
     {
         var product = await dbContext.Set<Product>().SingleOrDefaultAsync(p => p.Id == request.ProductId);
         if(product is null)

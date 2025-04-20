@@ -25,7 +25,13 @@ public class GetOrderByPaymentIdQueryHandler(IBookingsDbContext bookingsDbContex
             throw new NotFoundException(nameof(Order), request.PaymentId);
         }
         
-        var product = await sender.Send(new GetProductByIdQuery(order.ProductId));
+        var productResult = await sender.Send(new GetProductByIdQuery(order.ProductId));
+        if (productResult.IsFailure)
+        {
+            throw new NotFoundException("Product", order.ProductId);
+        }
+
+        var product = productResult.Value;
 
         var orderItemDtos = new List<OrderItemDto>();
         decimal totalPrice = 0;

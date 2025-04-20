@@ -1,8 +1,7 @@
 ﻿using Bookings.Application.Common.Interfaces;
-using Bookings.Domain.Common;
-using Bookings.Infrastructure.Persistance.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Infrastructure.Persistance;
 

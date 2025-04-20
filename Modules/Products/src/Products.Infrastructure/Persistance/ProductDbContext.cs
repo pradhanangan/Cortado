@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Products.Application.Common.Interfaces;
-using Products.Domain.Common;
+using Shared.Common.Abstraction;
 
 namespace Products.Infrastructure.Persistance;
 

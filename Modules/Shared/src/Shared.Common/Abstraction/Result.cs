@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
 
-namespace Customers.Domain.Common;
+namespace Shared.Common.Abstraction;
 
 public class Result
 {

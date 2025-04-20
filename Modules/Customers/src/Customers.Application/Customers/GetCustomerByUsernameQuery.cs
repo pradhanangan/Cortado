@@ -1,11 +1,11 @@
 ﻿using Customers.Application.Common.Exceptions;
 using Customers.Application.Common.Interfaces;
 using Customers.Application.Customers.Dtos;
-using Customers.Domain.Common;
 using Customers.Domain.Entities;
 using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Common.Abstraction;
 
 namespace Customers.Application.Customers;
 

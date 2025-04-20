@@ -1,4 +1,4 @@
-﻿using Bookings.Domain.Common;
+﻿using Shared.Common.Abstraction;
 
 namespace Bookings.Domain.Entities;
 

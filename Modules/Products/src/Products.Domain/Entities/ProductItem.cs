@@ -1,4 +1,4 @@
-﻿using Products.Domain.Common;
+﻿using Shared.Common.Abstraction;
 
 namespace Products.Domain.Entities;
 

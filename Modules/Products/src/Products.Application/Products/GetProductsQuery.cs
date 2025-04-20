@@ -5,14 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Products.Application.Common.Interfaces;
 using Products.Application.Products.Dtos;
 using Products.Domain.Entities;
+using Shared.Common.Abstraction;
 
 namespace Products.Application.Products;
 
-public record GetProductsQuery : IRequest<List<ProductDto>>;
+public record GetProductsQuery : IRequest<Result<List<ProductDto>>>;
 
-public class GetProductsQueryHandler(IServiceScopeFactory serviceScopeFactory, IProductDbContext productDbContext) : IRequestHandler<GetProductsQuery, List<ProductDto>>
+public class GetProductsQueryHandler(IServiceScopeFactory serviceScopeFactory, IProductDbContext productDbContext) : IRequestHandler<GetProductsQuery, Result<List<ProductDto>>>
 {
-    public async Task<List<ProductDto>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<ProductDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
     {
         
        

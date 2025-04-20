@@ -30,7 +30,8 @@ public class EditModel(ISender mediatr) : PageModel
 
         Order = await mediatr.Send(new GetOrderByIdQuery(id.Value));
         Tickets = Order.OrderItems.SelectMany(oi => oi.Tickets).ToList();
-        Product = await mediatr.Send(new GetProductByIdQuery(Order.ProductId));
+        var productResult = await mediatr.Send(new GetProductByIdQuery(Order.ProductId));
+        Product = productResult.Value;
         return Page();
     }
 

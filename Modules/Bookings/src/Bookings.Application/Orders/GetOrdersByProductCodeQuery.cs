@@ -1,13 +1,12 @@
 ﻿using Bookings.Application.Common.Interfaces;
 using Bookings.Application.Orders.Dtos;
 using Bookings.Domain.Entities;
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Products.Application.Common.Exceptions;
 using Products.Application.Common.Interfaces;
 using Products.Domain.Entities;
-using Mapster;
-using Bookings.Domain.Common;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Orders;
 

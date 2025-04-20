@@ -15,7 +15,8 @@ namespace Cortado.API.Pages.Admin.Products
         {
             if(id is null) { return NotFound(); }
 
-            Product = await mediator.Send(new GetProductByIdQuery(id.Value));
+            var productResult = await mediator.Send(new GetProductByIdQuery(id.Value));
+            Product = productResult.Value;
             return Page();
         }
     }

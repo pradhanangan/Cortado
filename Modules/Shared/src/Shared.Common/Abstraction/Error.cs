@@ -1,4 +1,4 @@
-﻿namespace Customers.Domain.Common;
+﻿namespace Shared.Common.Abstraction;
 
 public record Error(string Code, string Name)
 {

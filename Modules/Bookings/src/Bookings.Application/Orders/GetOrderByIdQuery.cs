@@ -1,4 +1,5 @@
-﻿using Bookings.Application.Common.Interfaces;
+﻿using Bookings.Application.Common.Exceptions;
+using Bookings.Application.Common.Interfaces;
 using Bookings.Application.Orders.Dtos;
 using Bookings.Domain.Entities;
 using Mapster;
@@ -20,8 +21,14 @@ public class GetOrderByIdQueryHandler(IBookingsDbContext bookingsDbContext, ISen
             .ThenInclude(oi => oi.Tickets)
             .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-        var product = await sender.Send(new GetProductByIdQuery(order.ProductId));
-        
+        var productResult = await sender.Send(new GetProductByIdQuery(order.ProductId));
+        if (productResult.IsFailure)
+        {
+            throw new NotFoundException("Product", order.ProductId);
+        }
+
+        var product = productResult.Value;
+
         var orderItemDtos = new List<OrderItemDto>();
         decimal totalPrice = 0;
         foreach (var oi in order.OrderItems)

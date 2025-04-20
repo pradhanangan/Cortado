@@ -1,4 +1,4 @@
-﻿namespace Bookings.Domain.Common;
+﻿namespace Shared.Common.Abstraction;
 
 public abstract class BaseAuditableEntity : BaseEntity
 {
