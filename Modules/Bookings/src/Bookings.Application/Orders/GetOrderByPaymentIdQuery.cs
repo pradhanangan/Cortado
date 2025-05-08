@@ -5,15 +5,16 @@ using Bookings.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Products.Application.Products;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Orders;
 
-public record GetOrderByPaymentIdQuery(string PaymentId) : IRequest<OrderDto>;
+public record GetOrderByPaymentIdQuery(string PaymentId) : IRequest<Result<OrderDto>>;
 
 
-public class GetOrderByPaymentIdQueryHandler(IBookingsDbContext bookingsDbContext, ISender sender) : IRequestHandler<GetOrderByPaymentIdQuery, OrderDto>
+public class GetOrderByPaymentIdQueryHandler(IBookingsDbContext bookingsDbContext, ISender sender) : IRequestHandler<GetOrderByPaymentIdQuery, Result<OrderDto>>
 {
-    public async Task<OrderDto> Handle(GetOrderByPaymentIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<OrderDto>> Handle(GetOrderByPaymentIdQuery request, CancellationToken cancellationToken)
     {
         var order = await bookingsDbContext.Set<Order>()
             .Include(o => o.OrderItems)

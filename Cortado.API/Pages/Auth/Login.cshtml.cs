@@ -120,8 +120,8 @@ namespace Cortado.API.Pages.Auth
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var principal = new ClaimsPrincipal(identity);
 
-                    //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                    await HttpContext.SignInAsync("MyCookieAuth", principal);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                //await HttpContext.SignInAsync("MyCookieAuth", principal);
 
                     return true;
                 //}

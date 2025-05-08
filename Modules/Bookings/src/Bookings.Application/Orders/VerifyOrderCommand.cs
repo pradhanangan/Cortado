@@ -3,15 +3,16 @@ using Bookings.Application.Common.Exceptions;
 using Bookings.Application.Common.Interfaces;
 using Bookings.Domain.Entities;
 using MediatR;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Orders;
 
-public sealed record class VerifyOrderCommand(string Token) : IRequest<VerifyOrderResponse>;
+public sealed record class VerifyOrderCommand(string Token) : IRequest<Result<VerifyOrderResponse>>;
 public sealed record class VerifyOrderResponse(string Status);
 
-public class VerifyOrderCommandHandler(IBookingsDbContext bookingDbContext, ITokenService tokenService) : IRequestHandler<VerifyOrderCommand, VerifyOrderResponse>
+public class VerifyOrderCommandHandler(IBookingsDbContext bookingDbContext, ITokenService tokenService) : IRequestHandler<VerifyOrderCommand, Result<VerifyOrderResponse>>
 {
-    public async Task<VerifyOrderResponse> Handle(VerifyOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result<VerifyOrderResponse>> Handle(VerifyOrderCommand request, CancellationToken cancellationToken)
     {
         (string orderId, string email) = ("", "");
         try

@@ -25,6 +25,7 @@ CREATE TABLE product_items
     name text NOT NULL,
     description text NOT NULL,
     variants text NOT NULL,
+    is_free boolean NOT NULL,
     unit_price decimal NOT NULL,
     product_id uuid NOT NULL,
     created_by text NOT NULL,

@@ -129,3 +129,8 @@ public GetMembersQueryHandler(ILogger<GetMembersQueryHandler> logger)
 
 ### Patterns
 Result Type/Pattern
+
+
+### Application Layer
+MediatR
+Microsoft.Extensions.Configuration.Abstractions

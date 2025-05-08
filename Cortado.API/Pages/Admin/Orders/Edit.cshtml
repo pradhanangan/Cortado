@@ -3,69 +3,126 @@
 @{
 }
 
-<h5>Orders > Edit</h5>
-<div class="row">
-        <div class="col-md-4">
-        Order Id: @Model.Order.Id
-        
-        </div>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        Product Id: @Model.Order.ProductId
+<h5>Orders > Edit > @Model.Order.Id</h5>
 
+
+
+<form method="post">
+    <input type="hidden" asp-for="Order.Id" />
+    <input type="hidden" asp-for="Order.ProductId" />
+    <input type="hidden" asp-for="Order.IsPaid"/>
+    <input type="hidden" asp-for="Order.PaymentId" />
+    <input type="hidden" asp-for="Order.IsConfirmed" />
+   
+
+
+    <div class="row">
+        <div class="col-md-12 d-flex">
+            <div class="form-group d-flex align-items-center" style="margin: 16px 24px 16px 0">
+                <label class="form-label me-2" style="font-weight: bold; color: #6c757d;">Is Paid:</label>
+                
+                <span class="badge @(Model.Order.IsPaid ? "bg-success" : "bg-danger")">
+                    @((Model.Order.IsPaid) ? "Paid" : "Not Paid")
+                </span>
+            </div>
+           @if(@Model.Order.IsPaid){
+               <div class="form-group d-flex align-items-center" style="margin: 16px 24px 16px 0">
+                <label class="form-label me-2" style="font-weight: bold; color: #6c757d;">Payment Id:</label>
+                <span style="margin-left: 8px; ">@Model.Order.PaymentId</span>
+                
+            </div>
+           }
+            <div class="form-group d-flex align-items-center" style="margin: 16px 24px 16px 0">
+                <label class="form-label me-2" style="font-weight: bold; color: #6c757d;">Is Confirmed:</label>
+                <span class="badge @(Model.Order.IsConfirmed ? "bg-success" : "bg-danger")">
+                    @((Model.Order.IsConfirmed) ? "Confirmed" : "Not Confirmed")
+                </span>
+            </div>
+        </div>
     </div>
-</div>
-<div class="row">
-    <form method="post">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex align-items-center" style="margin: 0 0 8px 0">
+                <span>Product:</span>
+                <span style="margin-left: 8px; ">@Model.Product.Name</span>
+                <span style="margin-left: 8px; font-style: italic; color: #6c757d;">(@Model.Order.ProductId)</span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-4">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Order.Id" />
-            <input type="hidden" asp-for="Order.ProductId"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="Order.Email" class="form-label"></label>
                 <input asp-for="Order.Email" class="form-control" />
                 <span asp-validation-for="Order.Email" class="text-danger"></span>
             </div>
+        </div>
+        <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="Order.PhoneNumber" class="form-label"></label>
                 <input asp-for="Order.PhoneNumber" class="form-control" />
                 <span asp-validation-for="Order.PhoneNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <div class="form-check">
-                    <input asp-for="Order.IsEmailVerified" class="form-check-input" type="checkbox" />
-                    <label asp-for="Order.IsEmailVerified" class="form-check-label"></label>
-                </div>
-                <span asp-validation-for="Order.IsEmailVerified" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <div class="form-check">
-                    <input asp-for="Order.IsPaid" class="form-check-input" type="checkbox" />
-                    <label asp-for="Order.IsPaid" class="form-check-label"></label>
-                </div>
-                <span asp-validation-for="Order.IsPaid" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <div class="form-check">
-                    <input asp-for="Order.IsConfirmed" class="form-check-input" type="checkbox" />
-                    <label asp-for="Order.IsConfirmed" class="form-check-label"></label>
-                </div>
-                <span asp-validation-for="Order.IsConfirmed" class="text-danger"></span>
-            </div>
+        </div>
+        <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="Order.OrderDate" class="form-label"></label>
-                <input asp-for="Order.OrderDate" class="form-control" />
+                <input asp-for="Order.OrderDate" class="form-control" type="date" />
+                <input type="hidden" name="OriginalOrderDate" value="@Model.Order.OrderDate.ToUniversalTime().ToString("o")"/>
                 <span asp-validation-for="Order.OrderDate" class="text-danger"></span>
             </div>
-            
-            
         </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 d-flex">
+            <div class="form-group" style="margin: 16px 24px 16px 0">
+                <div class="form-check" >
+                    <input asp-for="Order.IsVerified" class="form-check-input" type="checkbox" />
+                    <label asp-for="Order.IsVerified" class="form-check-label"></label>
+                    
+                    <span asp-validation-for="Order.IsVerified" class="text-danger"></span>
+                </div>
+            </div>
+ 
+            
+
+        </div>
+
+        </div>
+       @*  <div class="row">
+            <div class="col-md-4">
+
+                <div class="form-group">
+            <label asp-for="Order.OrderDate" class="form-label"></label>
+            <input asp-for="Order.OrderDate" class="form-control" type="date"/>
+            <span asp-validation-for="Order.OrderDate" class="text-danger"></span>
+        </div>
+        </div>
+    </div> *@
+            
+        
         <div class="form-group mt-2">
-            <input type="submit" disabled="@(Model.Order.IsPaid && Model.Order.IsEmailVerified && Model.Order.IsConfirmed)" value="Save" class="btn btn-primary" />
+            <input type="submit" disabled="@(Model.Order.IsPaid && Model.Order.IsVerified && Model.Order.IsConfirmed)" value="Save" class="btn btn-primary" />
         </div>
     </form>
+
+
+<hr/>
+<div class="row">
+    <div class="col-md-12 d-flex">
+        <button type="button" class="btn btn-sm btn-primary" onclick="ShowModal()" style="margin-right: 16px" disabled="@(Model.Order.IsPaid)">Mark Order as Paid</button>
+        <form method="post" >
+            <input type="hidden" asp-for="Order.Id" />
+            <button type="submit" asp-page-handler="ConfirmOrder" class="btn btn-sm btn-primary" disabled="@(Model.Order.IsConfirmed)">Mark Order as Confirmed</button>
+        </form>
+    </div>
 </div>
+<hr/>
 
 <h5>Order Items</h5>
 
@@ -114,7 +171,7 @@
         <input type="hidden" asp-for="Order.Id" />
         @* <input type="hidden" asp-for="@Model.Booking.NumAdults" />
         <input type="hidden" asp-for="@Model.Booking.NumKids" />
-         *@<button type="submit" class="btn btn-primary" disabled="@(Model.Tickets != null && Model.Tickets.Any() ||!(Model.Order.IsPaid && Model.Order.IsEmailVerified && Model.Order.IsConfirmed))">Generate Ticket(s)</button>
+         *@<button type="submit" class="btn btn-primary" disabled="@(Model.Tickets != null && Model.Tickets.Any() ||!(Model.Order.IsPaid && Model.Order.IsVerified && Model.Order.IsConfirmed))">Generate Ticket(s)</button>
         @* <button type="submit" class="btn btn-primary" disabled="@(Model.Booking.Tickets != null && Model.Booking.Tickets.Any() || !(Model.Booking.IsPaid && Model.Booking.IsEmailVerified && Model.Booking.IsConfirmed))">Generate Ticket(s)</button> *@
         @* <button type="submit" class="btn btn-primary" @((Model.Booking.Tickets != null && Model.Booking.Tickets.Any() ? "disabled" : Model.Booking.IsPaid && Model.Booking.IsEmailVerified && Model.Booking.IsConfirmed ? "": "disabled"))> Generate Ticket(s)</button> *@
     </form>
@@ -140,3 +197,84 @@
 <div>
     <a asp-page="./Index" asp-route-productCode="@Model.Product.Code">Back to List</a>
 </div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="MarkAsPaid" id="modalForm">
+                <input type="hidden" asp-for="Order.Id" />
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mark Order as Paid</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--Error container-->
+                    <div id="modalErrorContainer" class="alert alert-danger d-none"></div>
+                <div class="form-group">
+                    <label asp-for="Order.PaymentId" class="form-label"></label>
+                    <input asp-for="Order.PaymentId" class="form-control" required />
+                    <span asp-validation-for="Order.PaymentId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btnClose">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function ShowModal() {
+
+        $("#exampleModal").modal('show');
+    }
+
+    // function HideModal() {
+    //     $("#exampleModal").modal('hide');
+    // }
+    document.addEventListener("DOMContentLoaded", function () {
+     document.getElementById("modalForm").addEventListener("submit", function (event) {
+         debugger;
+        event.preventDefault(); // Prevent default form submission
+
+        const form = event.target;
+        const formData = new FormData(form);
+            console.log("Form action:", form.action); // Debug the action URL
+                   const errorContainer = document.getElementById("modalErrorContainer");
+        fetch(form.action, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            debugger;
+            if (data.success) {
+                // Close the modal if the operation was successful
+                $("#exampleModal").modal("hide");
+                // Optionally, refresh the page or update the UI
+                location.reload();
+            } else {
+                 // Display validation errors
+                errorContainer.classList.remove("d-none"); // Show the error container
+                errorContainer.innerHTML = data.errors.join("<br>"); // Populate with errors
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+             console.error("Error:", error);
+            errorContainer.classList.remove("d-none"); // Show the error container
+            errorContainer.innerHTML = "An unexpected error occurred. Please try again.";
+        });
+    });
+    $("#btnClose").on("click", function() {
+        debugger;
+        $("#exampleModal").modal("hide");
+    })
+        
+    });
+    
+</script>

@@ -2,14 +2,15 @@
 using Bookings.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Tickets;
 
-public sealed record VerifyTicketCommand(string TicketNumber) : IRequest<VerifyTicketCommandResponse>;
+public sealed record VerifyTicketCommand(string TicketNumber) : IRequest<Result<VerifyTicketCommandResponse>>;
 
-public class VerifyTicketCommandHandler(IBookingsDbContext applicationDbContext) : IRequestHandler<VerifyTicketCommand, VerifyTicketCommandResponse>
+public class VerifyTicketCommandHandler(IBookingsDbContext applicationDbContext) : IRequestHandler<VerifyTicketCommand, Result<VerifyTicketCommandResponse>>
 {
-    public async Task<VerifyTicketCommandResponse> Handle(VerifyTicketCommand request, CancellationToken cancellationToken)
+    public async Task<Result<VerifyTicketCommandResponse>> Handle(VerifyTicketCommand request, CancellationToken cancellationToken)
     {
         var ticket = await applicationDbContext.Set<Ticket>().SingleOrDefaultAsync(t => t.TicketNumber == request.TicketNumber, cancellationToken);
         if (ticket == null)

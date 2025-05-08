@@ -5,17 +5,18 @@ using MediatR;
 using Products.Application.Products;
 using Products.Application.Products.Dtos;
 using Products.Domain.Entities;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Orders;
 
 public record CreateOrderCommand(Guid ProductId, string Email, string PhoneNumber, string FirstName,
-    string LastName, List<CreateOrderItem> OrderItems, DateTime OrderDate) : IRequest<Guid>;
+    string LastName, List<CreateOrderItem> OrderItems, DateTime OrderDate) : IRequest<Result<Guid>>;
 
 public record CreateOrderItem(Guid ProductItemId, int Quantity);
 
-public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ITokenService tokenService, IEmailService emailService, ISender mediatr) : IRequestHandler<CreateOrderCommand, Guid>
+public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ITokenService tokenService, IEmailService emailService, ISender mediatr) : IRequestHandler<CreateOrderCommand, Result<Guid>>
 {
-    public async Task<Guid> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
         try
         {

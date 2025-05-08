@@ -1,4 +1,5 @@
 ﻿using Cortado.API.Contracts;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ using Products.Application.Products.Dtos;
 
 namespace Cortado.API.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme + "," + CookieAuthenticationDefaults.AuthenticationScheme)]
     [Route("api/products")]
     [ApiController]
     public class ProductsController: ApiControllerBase<ProductsController>
@@ -17,10 +18,12 @@ namespace Cortado.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> Get()
         {
+            Logger.LogInformation("{Controller} called", nameof(ProductsController));
             var products = await Mediator.Send(new GetProductsQuery());
-            return Ok(products);
+            return Ok(products.Value);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> Get(Guid id)
         {
@@ -32,6 +35,13 @@ namespace Cortado.API.Controllers
         public async Task<ActionResult<ProductDto>> GetProductByCode([FromQuery] string code)
         {
             var result = await Mediator.Send(new GetProductByCodeQuery(code));
+            return result.Value;
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> SearchProductsByCode([FromQuery] string code)
+        {
+            var result = await Mediator.Send(new SearchProductsByCodeQuery(code));
             return result.Value;
         }
 
@@ -70,6 +80,7 @@ namespace Cortado.API.Controllers
                 request.Name,
                 request.Description,
                 request.Variants,
+                request.IsFree,
                 request.UnitPrice
             ));
             return result.Value;

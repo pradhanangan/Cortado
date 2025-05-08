@@ -7,7 +7,7 @@ using Shared.Common.Abstraction;
 
 namespace Products.Application.ProductItems;
 
-public sealed record CreateProductItemCommand(Guid ProductId, string Name, string Description, string Variants, decimal UnitPrice) : IRequest<Result<Guid>>;
+public sealed record CreateProductItemCommand(Guid ProductId, string Name, string Description, string Variants, bool IsFree, decimal UnitPrice) : IRequest<Result<Guid>>;
 
 public class CreateProductItemCommandHandler(IProductDbContext dbContext) : IRequestHandler<CreateProductItemCommand, Result<Guid>>
 {
@@ -26,6 +26,7 @@ public class CreateProductItemCommandHandler(IProductDbContext dbContext) : IReq
             Name = request.Name,
             Description = request.Description,
             Variants = request.Variants,
+            IsFree = request.IsFree,
             UnitPrice = request.UnitPrice
         };
 

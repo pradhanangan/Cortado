@@ -1,9 +1,12 @@
 ﻿using Bookings.Application.Tickets;
 using Microsoft.AspNetCore.Mvc;
 using Cortado.API.Contracts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Cortado.API.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/tickets")]
     [ApiController]
     public class TicketsController : ApiControllerBase<TicketsController>
@@ -19,9 +22,10 @@ namespace Cortado.API.Controllers
         //}
 
         [HttpPost]
-        public async Task<List<Guid>> Post(CreateTicketRequest request)
+        public async Task<ActionResult<List<Guid>>> Post(CreateTicketRequest request)
         {
-            return await Mediator.Send(new CreateTicketCommand(request.OrderId));
+            var response = await Mediator.Send(new CreateTicketCommand(request.OrderId));
+            return Ok(response);
         }
 
         [HttpPost("verify-ticket")]

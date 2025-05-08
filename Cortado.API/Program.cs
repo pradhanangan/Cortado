@@ -10,8 +10,52 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Net;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Logs;
+using Shared.Common.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure logging using Shared.Common
+LoggingConfiguration.ConfigureSerilog(builder);
+
+//builder.Services.AddOpenTelemetry()
+//    .ConfigureResource(resource => resource.AddService("Cortado-Test600"))
+//    .WithMetrics(metrics => {
+//        metrics
+//            .AddAspNetCoreInstrumentation()
+//            .AddHttpClientInstrumentation();
+
+//        metrics.AddOtlpExporter(option => {
+//            option.Endpoint = new Uri("http://localhost:18889");
+//        });
+//    })
+//    .WithTracing(tracing => {
+//        tracing
+//            .AddAspNetCoreInstrumentation()
+//            .AddHttpClientInstrumentation()
+//            .AddEntityFrameworkCoreInstrumentation();
+
+
+//        tracing.AddOtlpExporter(option => {
+//            option.Endpoint = new Uri("http://localhost:18889");
+//        });
+//    });
+
+//builder.Logging.ClearProviders(); // Clear default logging providers
+//builder.Logging
+//    .AddOpenTelemetry(logging =>
+//    {
+//        logging.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Cortado-Test400"));
+//        logging.AddOtlpExporter(option =>
+//        {
+//            option.Endpoint = new Uri("http://localhost:18889"); // OpenTelemetry OTLP/gRPC endpoint
+//            option.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+//        });
+//    });
+
 
 // Allow CORs
 builder.Services.AddCors(options =>
@@ -52,12 +96,17 @@ builder.Services.AddRazorPages();  // Add this line
 
 builder.Services.AddAuthentication(options =>
 {
-    //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    //options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultScheme = "MyCookieAuth";
-    options.DefaultChallengeScheme = "MyCookieAuth";
+    ////options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    ////options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    //options.DefaultScheme = "MyCookieAuth";
+    //options.DefaultChallengeScheme = "MyCookieAuth";
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-    .AddCookie("MyCookieAuth", options =>
+    //.AddCookie("MyCookieAuth", options =>
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.Cookie.Name = "MyCookieAuth";
         options.LoginPath = "/Auth/Login";

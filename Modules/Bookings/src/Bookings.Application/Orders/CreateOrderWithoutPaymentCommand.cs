@@ -6,16 +6,17 @@ using Bookings.Application.Common.Exceptions;
 using Products.Domain.Entities;
 using Bookings.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Orders;
 
 public record CreateOrderWithPaymentCommand(Guid ProductId, string Email, string PhoneNumber, string FirstName,
-    string LastName, List<CreateOrderItem> OrderItems, DateTime OrderDate, bool IsPaid, string PaymentId) : IRequest<Guid>;
+    string LastName, List<CreateOrderItem> OrderItems, DateTime OrderDate, bool IsPaid, string PaymentId) : IRequest<Result<Guid>>;
 
 
-public class CreateOrderWithPaymentCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ISender mediatr) : IRequestHandler<CreateOrderWithPaymentCommand, Guid>
+public class CreateOrderWithPaymentCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ISender mediatr) : IRequestHandler<CreateOrderWithPaymentCommand, Result<Guid>>
 {
-    public async Task<Guid> Handle(CreateOrderWithPaymentCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateOrderWithPaymentCommand request, CancellationToken cancellationToken)
     {
         try
         {

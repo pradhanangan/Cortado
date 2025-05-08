@@ -16,6 +16,7 @@ public class EditModel(ISender mediatr) : PageModel
 {
     [BindProperty]
     public OrderDto Order { get; set; }
+
     [BindProperty]
     public ProductDto Product { get; set; }
 
@@ -28,7 +29,8 @@ public class EditModel(ISender mediatr) : PageModel
             return NotFound();
         }
 
-        Order = await mediatr.Send(new GetOrderByIdQuery(id.Value));
+        var orderResult = await mediatr.Send(new GetOrderByIdQuery(id.Value));
+        Order = orderResult.Value;
         Tickets = Order.OrderItems.SelectMany(oi => oi.Tickets).ToList();
         var productResult = await mediatr.Send(new GetProductByIdQuery(Order.ProductId));
         Product = productResult.Value;
@@ -43,20 +45,70 @@ public class EditModel(ISender mediatr) : PageModel
             throw new InvalidOperationException("Order not found");
         }
 
+        // Retrieve the original OrderDate value (including time and time zone)
+        var originalOrderDate = DateTime.Parse(Request.Form["OriginalOrderDate"]).ToUniversalTime();
+
+        // Combine the submitted date with the original time and time zone
+        var submittedDate = DateTime.Parse(Request.Form["Order.OrderDate"]);
+        var dt = new DateTime(
+            submittedDate.Year,
+            submittedDate.Month,
+            submittedDate.Day,
+            originalOrderDate.Hour,
+            originalOrderDate.Minute,
+            originalOrderDate.Second,
+            originalOrderDate.Kind
+        );
+
         await mediatr.Send(new UpdateOrderCommand(Order.Id,
                 Order.ProductId,
                 Order.Email,
                 Order.PhoneNumber,
-                Order.IsEmailVerified,
+                Order.IsVerified,
                 Order.IsPaid,
                 Order.IsConfirmed,
                 Order.OrderDate,
-                new(),
-                Order.PaymentId
+                Order.PaymentId ?? ""
             ));
 
             return RedirectToPage(new {id=Order.Id});
        
+    }
+
+    public async Task<IActionResult> OnPostMarkAsPaid()
+    {
+        if (Order is null)
+        {
+            throw new InvalidOperationException("Order not found");
+        }
+
+        var result = await mediatr.Send(new MarkOrderAsPaidCommand(Order.Id, Order.PaymentId));
+        
+        if(result.IsFailure)
+        {
+            return new JsonResult(new { success = false, errors = new[] { result.Error.Name } });
+        }
+        // Optionally, you can add a success message or redirect to another page
+        TempData["Message"] = "Order confirmed!";
+        // Return success response
+        return new JsonResult(new { success = true });
+        //return RedirectToPage(new { id = Order.Id });
+    }
+
+    public async Task<IActionResult> OnPostConfirmOrder()
+    {
+
+      
+
+        if (Order is null)
+        {
+            throw new InvalidOperationException("Order not found");
+        }
+
+        await mediatr.Send(new MarkOrderAsConfirmedCommand(Order.Id));
+        // Optionally, you can add a success message or redirect to another page
+        TempData["Message"] = "Order confirmed!";
+        return RedirectToPage(new { id = Order.Id });
     }
 
     public async Task<IActionResult> OnPostGenerateTickets()

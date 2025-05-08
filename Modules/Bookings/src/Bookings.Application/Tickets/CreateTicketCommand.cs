@@ -5,15 +5,16 @@ using Bookings.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Products.Application.Products;
+using Shared.Common.Abstraction;
 using System.Text;
 
 namespace Bookings.Application.Tickets;
 
-public sealed record CreateTicketCommand(Guid OrderId) : IRequest<List<Guid>>;
+public sealed record CreateTicketCommand(Guid OrderId) : IRequest<Result<List<Guid>>>;
 
-public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQrCodeService qrCodeService, IEmailService emailService, ITicketRepository ticketRepository, ISender medaitr) : IRequestHandler<CreateTicketCommand, List<Guid>>
+public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQrCodeService qrCodeService, IEmailService emailService, ITicketRepository ticketRepository, ISender medaitr) : IRequestHandler<CreateTicketCommand, Result<List<Guid>>>
 {
-    public async Task<List<Guid>> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
+    public async Task<Result<List<Guid>>> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
     {
         var order = await bookingDbContext.Set<Order>().
             Include(o => o.OrderItems).SingleOrDefaultAsync(b => b.Id == request.OrderId);

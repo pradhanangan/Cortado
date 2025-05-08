@@ -18,6 +18,9 @@ namespace Cortado.API.Pages.Admin.ProductItems
         [BindProperty]
         public string Variants { get; set; } = string.Empty;
         [BindProperty]
+        public bool IsFree { get; set; }
+
+        [BindProperty]
         public decimal UnitPrice { get; set; } = 0;
 
         public void OnGet(Guid productId)
@@ -32,7 +35,7 @@ namespace Cortado.API.Pages.Admin.ProductItems
                 return Page();
 
             }
-            await mediator.Send(new CreateProductItemCommand(ProductId, Name, Description, Variants, UnitPrice));
+            await mediator.Send(new CreateProductItemCommand(ProductId, Name, Description, Variants, IsFree, UnitPrice));
             return RedirectToPage("/Admin/Products/Edit", new { id = ProductId } );
         }
     }

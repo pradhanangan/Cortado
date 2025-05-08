@@ -7,14 +7,15 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Products.Application.Common.Interfaces;
 using Products.Application.Products;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Orders;
 
-public record GetOrderByIdQuery(Guid Id) : IRequest<OrderDto>;
+public record GetOrderByIdQuery(Guid Id) : IRequest<Result<OrderDto>>;
 
-public class GetOrderByIdQueryHandler(IBookingsDbContext bookingsDbContext, ISender sender) : IRequestHandler<GetOrderByIdQuery, OrderDto>
+public class GetOrderByIdQueryHandler(IBookingsDbContext bookingsDbContext, ISender sender) : IRequestHandler<GetOrderByIdQuery, Result<OrderDto>>
 {
-    public async Task<OrderDto> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<OrderDto>> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
     {
         var order = await bookingsDbContext.Set<Order>()
             .Include(o => o.OrderItems)
