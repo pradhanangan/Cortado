@@ -35,15 +35,13 @@ public class GetOrderByPaymentIdQueryHandler(IBookingsDbContext bookingsDbContex
         var product = productResult.Value;
 
         var orderItemDtos = new List<OrderItemDto>();
-        decimal totalPrice = 0;
         foreach (var oi in order.OrderItems)
         {
             var productItemName = product.ProductItems.FirstOrDefault(pi => pi.Id == oi.ProductItemId)?.Name ?? "";
-            orderItemDtos.Add(new OrderItemDto(oi.Id, oi.OrderId, oi.ProductItemId, productItemName, oi.Quantity, oi.Price, new()));
-            totalPrice += oi.Price;
+            orderItemDtos.Add(new OrderItemDto(oi.Id, oi.OrderId, oi.ProductItemId, productItemName, oi.UnitPrice, oi.Quantity, oi.LineTotal, new()));
         }
 
-        var orderDto = new OrderDto(order.Id, order.ProductId, order.Email, order.PhoneNumber, order.IsVerified, order.IsPaid, order.IsConfirmed, order.OrderDate, totalPrice, orderItemDtos, order.PaymentId);
+        var orderDto = new OrderDto(order.Id, order.OrderNumber, order.ProductId, order.Email, order.PhoneNumber, order.OrderDate, orderItemDtos, order.SubTotal, order.TotalAmount, order.IsVerified, order.IsPaid, order.PaymentId, order.IsConfirmed);
 
         return orderDto;
     }

@@ -36,7 +36,7 @@ public class OrdersController : ApiControllerBase<OrdersController>
     }
 
     [HttpPost("with-payment")]
-    public async Task<ActionResult<Guid>> CreateOrderWithoutPayment(CreateOrderWithPaymentRequest request)
+    public async Task<ActionResult<Guid>> CreateOrderWithPayment(CreateOrderWithPaymentRequest request)
     {
          var response = await Mediator.Send(new CreateOrderWithPaymentCommand(
             request.ProductId,
@@ -44,9 +44,8 @@ public class OrdersController : ApiControllerBase<OrdersController>
             request.PhoneNumber,
             request.FirstName,
             request.LastName,
-            request.OrderItems.Select(item => new CreateOrderItem(item.ProductItemId, item.Quantity)).ToList(),
             request.OrderDate,
-            request.IsPaid,
+            request.OrderItems.Select(item => new CreateOrderItem(item.ProductItemId, item.Quantity)).ToList(),
             request.PaymentId
         ));
         return CreatedAtAction(nameof(Post), response);
@@ -74,6 +73,13 @@ public class OrdersController : ApiControllerBase<OrdersController>
     {
         var response = await Mediator.Send(new VerifyOrderCommand(token));
         return Ok(response);
+    }
+
+    [HttpPut("{orderId}/mark-as-verified")]
+    public async Task<IActionResult> MarkAsVerified(Guid orderId)
+    {
+        var response = await Mediator.Send(new MarkOrderAsVerifiedCommand(orderId));
+        return Ok();
     }
 
     [AllowAnonymous]

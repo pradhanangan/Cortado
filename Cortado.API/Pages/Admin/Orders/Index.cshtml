@@ -20,7 +20,7 @@
                 Phone number
             </th> *@
             <th>
-                Num Tickets
+                Num tickets
             </th>
             <th>
                 Order date
@@ -66,8 +66,8 @@
                 </td>
                 <td>@* @(item.Tickets != null && item.Tickets.Any() ? "Yes" : "No") *@</td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
+                   
                 </td>
             </tr>
         }

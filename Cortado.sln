@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{6978DE6B-0BEE-4D86-B42D-A4F6E418C146}"
 	ProjectSection(SolutionItems) = preProject
+		00_DropAll.sql = 00_DropAll.sql
 		sql\01_CustomerModule.sql = sql\01_CustomerModule.sql
 		sql\02_ProductModule.sql = sql\02_ProductModule.sql
 		sql\03_BookingModule.sql = sql\03_BookingModule.sql

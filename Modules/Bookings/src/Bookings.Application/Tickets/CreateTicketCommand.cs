@@ -52,7 +52,7 @@ public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQr
                     OrderItemId = orderItem.Id,
                     TicketNumber = ticketNumber,
                     IsUsed = false,
-                    Price = orderItem.Price,
+                    Price = orderItem.UnitPrice,
                     Status = "Active",
                     QrCode = qrCode
                 };
@@ -67,46 +67,46 @@ public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQr
 
         await transaction.CommitAsync(cancellationToken);
 
-        // Send email with tickets to the user with QR code/ Barcode / ticket details OR background job
-        // Build the HTML body with embedded QR codes for SendGrid
-        var htmlBody = new StringBuilder();
-        htmlBody.Append("<html><body><p>Please find your Tickets:</p>");
-        var inlineImages = new List<EmailAttachment>();
-        var index = 0;
-        foreach (var ticket in tickets)
-        {
-            //var qrCodeBase64 = Convert.ToBase64String(ticket.QrCode!);
-            //htmlBody.Append($"<p>QR Code {index + 1}:</p>");
-            //htmlBody.Append($"<img src='data:image/png;base64,{qrCodeBase64}' alt='QR Code {index + 1}'/><br/>");
-            //index++;
-            var qrCodeImage = ticket.QrCode;
-            string contentId = $"QRCodeImage{index}"; // Unique Content ID for each QR code
-            htmlBody.Append($"<p>QR Code {index + 1}:</p>");
-            htmlBody.Append($"<img src='cid:{contentId}' alt='QR Code {index + 1}'/><br/>");
+        //// Send email with tickets to the user with QR code/ Barcode / ticket details OR background job
+        //// Build the HTML body with embedded QR codes for SendGrid
+        //var htmlBody = new StringBuilder();
+        //htmlBody.Append("<html><body><p>Please find your Tickets:</p>");
+        //var inlineImages = new List<EmailAttachment>();
+        //var index = 0;
+        //foreach (var ticket in tickets)
+        //{
+        //    //var qrCodeBase64 = Convert.ToBase64String(ticket.QrCode!);
+        //    //htmlBody.Append($"<p>QR Code {index + 1}:</p>");
+        //    //htmlBody.Append($"<img src='data:image/png;base64,{qrCodeBase64}' alt='QR Code {index + 1}'/><br/>");
+        //    //index++;
+        //    var qrCodeImage = ticket.QrCode;
+        //    string contentId = $"QRCodeImage{index}"; // Unique Content ID for each QR code
+        //    htmlBody.Append($"<p>QR Code {index + 1}:</p>");
+        //    htmlBody.Append($"<img src='cid:{contentId}' alt='QR Code {index + 1}'/><br/>");
 
-            var qrCodeImageBase64 = Convert.ToBase64String(qrCodeImage!);
-            var inlineImage = new EmailAttachment
-            (
-                qrCodeImageBase64,
-                "image/png",
-                $"QRCode{index + 1}.png",
-                "inline",
-                contentId
-            );
-            inlineImages.Add(inlineImage);
+        //    var qrCodeImageBase64 = Convert.ToBase64String(qrCodeImage!);
+        //    var inlineImage = new EmailAttachment
+        //    (
+        //        qrCodeImageBase64,
+        //        "image/png",
+        //        $"QRCode{index + 1}.png",
+        //        "inline",
+        //        contentId
+        //    );
+        //    inlineImages.Add(inlineImage);
 
-            index++;
+        //    index++;
 
-        }
-        htmlBody.Append("</body></html>");
-        try
-        {
+        //}
+        //htmlBody.Append("</body></html>");
+        //try
+        //{
 
-            await emailService.SendEmailAsync(order.Email, $"Tickets for {product.Code}", htmlBody.ToString(), inlineImages);
-        } catch(Exception e)
-        {
+        //    await emailService.SendEmailAsync(order.Email, $"Tickets for {product.Code}", htmlBody.ToString(), inlineImages);
+        //} catch(Exception e)
+        //{
 
-        }
+        //}
 
         return tickets.Select(t => t.Id).ToList();
     }

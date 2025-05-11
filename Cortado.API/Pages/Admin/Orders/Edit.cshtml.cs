@@ -75,6 +75,23 @@ public class EditModel(ISender mediatr) : PageModel
        
     }
 
+    public async Task<IActionResult> OnPostMarkAsVerified()
+    {
+        if (Order is null)
+        {
+            throw new Exception("Order not found");
+        }
+
+        var result = await mediatr.Send(new MarkOrderAsVerifiedCommand(Order.Id));
+
+        if (result.IsFailure)
+        {
+            throw new Exception(result.Error.Name);
+        }
+        
+        return RedirectToPage(new { id = Order.Id });
+    }
+
     public async Task<IActionResult> OnPostMarkAsPaid()
     {
         if (Order is null)
@@ -95,7 +112,7 @@ public class EditModel(ISender mediatr) : PageModel
         //return RedirectToPage(new { id = Order.Id });
     }
 
-    public async Task<IActionResult> OnPostConfirmOrder()
+    public async Task<IActionResult> OnPostMarkAsConfirmed()
     {
 
       
