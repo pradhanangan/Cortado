@@ -27,27 +27,38 @@ public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOr
             {
                 throw new NotFoundException(nameof(Product), request.ProductId);
             }
-            //if (product is null)
-            //{
-            //    throw new NotFoundException(nameof(Product), request.ProductId);
-            //}
+            
             var product = productResult.Value;
+
+            // Generate order id
+            var orderId = Guid.NewGuid();
+
+            // Create order items
+            var orderItems = request.OrderItems.Select(item => CreateOrderItem(orderId, item, product)).ToList();
 
             // Generate order number
             var orderNumberSequence = await orderRepository.GetNextOrderNumberAsync();
             var orderNumber = $"{product.Code}-{orderNumberSequence}";
 
-            var order = CreateOrder(request, orderNumber);
+            // Calculate sub total and total amount
+            var subTotal = orderItems.Sum(oi => oi.LineTotal);
+            var totalAmount = subTotal; // + product.Tax; // TODO: Add tax to order item
+
+            var order = CreateOrder(request, orderId, orderNumber, subTotal, totalAmount);
+
+            // Add order to the database
             bookingsDbContext.Add(order);
 
-            var orderItems = request.OrderItems.Select(item => CreateOrderItem(order.Id, item, product)).ToList();
+            // Add order items to the database
             foreach (var orderItem in orderItems)
             {
                 bookingsDbContext.Add(orderItem);
             }
 
+            // Save changes to the database
             await bookingsDbContext.SaveChangesAsync(cancellationToken);
 
+            // Commit the transaction
             await transaction.CommitAsync(cancellationToken);
 
             var token = tokenService.GenerateBookingVerificationToken(order.Id.ToString(), order.Email);
@@ -62,11 +73,11 @@ public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOr
         catch (Exception e) { throw; }
     }
 
-    private Order CreateOrder(CreateOrderCommand request, string orderNumber)
+    private Order CreateOrder(CreateOrderCommand request, Guid orderId, string orderNumber, decimal subTotal, decimal totalAmount)
     {
         return new Order
         {
-            Id = Guid.NewGuid(),
+            Id = orderId,
             OrderNumber = orderNumber,
             ProductId = request.ProductId,
             Email = request.Email,
@@ -74,6 +85,8 @@ public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOr
             FirstName = request.FirstName,
             LastName = request.LastName,
             OrderDate = request.OrderDate,
+            SubTotal = subTotal,
+            TotalAmount = totalAmount,
             IsPaid = false,
             PaymentId = string.Empty,
         };
@@ -82,15 +95,15 @@ public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOr
     private OrderItem CreateOrderItem(Guid orderId, CreateOrderItem item, ProductDto product)
     {
         var productItem = product.ProductItems.SingleOrDefault(pi => pi.Id == item.ProductItemId);
-        var price = productItem?.UnitPrice * item.Quantity ?? 0;
 
         return new OrderItem
         {
             Id = Guid.NewGuid(),
-            ProductItemId = item.ProductItemId,
             OrderId = orderId,
+            ProductItemId = item.ProductItemId,
             Quantity = item.Quantity,
-            Price = price
+            UnitPrice = productItem?.UnitPrice ?? 0,
+            LineTotal = productItem?.UnitPrice * item.Quantity ?? 0,
         };
     }
 }

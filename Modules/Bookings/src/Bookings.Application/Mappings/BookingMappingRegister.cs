@@ -35,20 +35,24 @@ public class BookingMappingRegister : IRegister
             .Map(dest => dest.IsPaid, src => src.IsPaid)
             ;
 
+       
+
         // Mapping for Order to OrderDto
         config.ForType<Order, OrderDto>()
             .ConstructUsing(src => new OrderDto(
                 src.Id,
+                src.OrderNumber,
                 src.ProductId,
                 src.Email,
                 src.PhoneNumber,
+                src.OrderDate,
+                src.OrderItems.Adapt<List<OrderItemDto>>(), // OrderItems
+                src.SubTotal,
+                src.TotalAmount,
                 src.IsVerified,
                 src.IsPaid,
-                src.IsConfirmed,
-                src.OrderDate,
-                src.OrderItems.Sum(oi => oi.Price * oi.Quantity), // TotalPrice
-                src.OrderItems.Adapt<List<OrderItemDto>>(), // OrderItems
-                src.PaymentId
+                src.PaymentId,
+                src.IsConfirmed
             ));
     }
 }

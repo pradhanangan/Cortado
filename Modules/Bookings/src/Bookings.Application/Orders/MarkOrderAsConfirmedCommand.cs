@@ -8,7 +8,7 @@ namespace Bookings.Application.Orders;
 
 public sealed record class MarkOrderAsConfirmedCommand(Guid OrderId) : IRequest<Result<bool>>;
 
-partial class MarkOrderAsConfirmedHandler(IBookingsDbContext bookingsDbContext) : IRequestHandler<MarkOrderAsConfirmedCommand, Result<bool>>
+public class MarkOrderAsConfirmedHandler(IBookingsDbContext bookingsDbContext) : IRequestHandler<MarkOrderAsConfirmedCommand, Result<bool>>
 {
     public async Task<Result<bool>> Handle(MarkOrderAsConfirmedCommand request, CancellationToken cancellationToken)
     {
