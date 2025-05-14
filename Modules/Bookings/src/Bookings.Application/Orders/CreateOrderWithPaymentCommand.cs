@@ -7,6 +7,8 @@ using Products.Domain.Entities;
 using Bookings.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Shared.Common.Abstraction;
+using FluentValidation;
+using Shared.Common.Exceptions;
 
 namespace Bookings.Application.Orders;
 
@@ -14,10 +16,16 @@ public record CreateOrderWithPaymentCommand(Guid ProductId, string Email, string
     string LastName, DateTime OrderDate, List<CreateOrderItem> OrderItems, string PaymentId) : IRequest<Result<Guid>>;
 
 
-public class CreateOrderWithPaymentCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ISender mediatr) : IRequestHandler<CreateOrderWithPaymentCommand, Result<Guid>>
+public class CreateOrderWithPaymentCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ISender mediatr, IValidator<CreateOrderWithPaymentCommand> validator) : IRequestHandler<CreateOrderWithPaymentCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CreateOrderWithPaymentCommand request, CancellationToken cancellationToken)
     {
+        var validationResult = validator.Validate(request);
+        if (!validationResult.IsValid)
+        {
+            throw new RequestValidationException(validationResult.Errors);
+        }
+
         try
         {
             using var transaction = await bookingsDbContext.BeginTransactionAsync(cancellationToken);

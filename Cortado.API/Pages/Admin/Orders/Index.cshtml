@@ -3,12 +3,27 @@
 @{
 }
 <h5>Orders</h5>
-<br />
 <form method="get">
-    <label for="productCode">Product code:</label>
-    <input type="text" name="productCode" id="productCode" value="@Model.ProductCode" placeholder="Search product code..." class="form-control" />
-    <ul id="productCodeSuggestions" class="dropdown-menu" style="display: none; position: absolute;"></ul>
-    <button type="submit" class="btn btn-primary">Search</button>
+    <div class="d-flex align-items-start" style="gap: 0.5rem">
+        <label for="productCode" class="me-2">Product code:</label>
+
+        <div style="position: relative; flex-grow: 1">
+            <input type="text"
+                   name="productCode"
+                   id="productCode"
+                   value="@Model.ProductCode"
+                   placeholder="Search product code..."
+                   class="form-control"
+                   autocomplete="off" />
+
+            <ul id="productCodeSuggestions"
+                class="dropdown-menu show"
+                style="display: none; width: 100%; top: 100%; left: 0; z-index: 1000; position: absolute;">
+            </ul>
+        </div>
+
+        <button type="submit" class="btn btn-primary ms-2">Search</button>
+    </div>
 </form>
 <table class="table table-striped">
     <thead>
@@ -16,9 +31,6 @@
             <th>
                 Email
             </th>
-            @* <th>
-                Phone number
-            </th> *@
             <th>
                 Num tickets
             </th>
@@ -45,10 +57,6 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
-                @* <td>
-                    @Html.DisplayFor(modelItem => item.PhoneNumber)
-                </td> *@
-                
                 <td>
                    @Html.DisplayFor(modelItem => item.TotalNumberOfTickets)
                 </td>

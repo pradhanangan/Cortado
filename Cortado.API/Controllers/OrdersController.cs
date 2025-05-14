@@ -35,6 +35,7 @@ public class OrdersController : ApiControllerBase<OrdersController>
         return CreatedAtAction(nameof(Post), response);
     }
 
+    [AllowAnonymous]
     [HttpPost("with-payment")]
     public async Task<ActionResult<Guid>> CreateOrderWithPayment(CreateOrderWithPaymentRequest request)
     {
