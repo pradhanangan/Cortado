@@ -15,6 +15,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Logs;
 using Shared.Common.Logging;
+using Cortado.API.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,7 +82,10 @@ builder.Services.AddProductsInfrastructureServices(builder.Configuration);
 
 builder.Services.AddCommonServices(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiExceptionFilterAttribute>();
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -144,6 +148,8 @@ builder.Services.AddAuthentication(options =>
          };
          //options.MetadataAddress = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo/.well-known/jwks.json";
      });
+
+//builder.WebHost.UseUrls("http://*:5000");
 
 var app = builder.Build();
 

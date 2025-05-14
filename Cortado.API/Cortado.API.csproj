@@ -7,6 +7,9 @@
     <UserSecretsId>b58995ff-ed5a-47d1-9ca9-c4d0f4b3cab9</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+	<!--<RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+	<SelfContained>true</SelfContained>
+	<PublishTrimmed>false</PublishTrimmed>-->
   </PropertyGroup>
 
   <!-- <ItemGroup>

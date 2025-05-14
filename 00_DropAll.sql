@@ -1,9 +1,9 @@
-﻿drop table tickets;
-drop table order_items;
-drop table orders;
-drop table product_items cascade;
-drop table products cascade;
-drop table customers;
+﻿DROP TABLE tickets;
+DROP TABLE order_items;
+DROP TABLE orders;
+DROP TABLE product_items CASCADE;
+DROP TABLE products CASCADE;
+DROP TABLE customers;
 
-drop sequence order_number_seq;
-drop sequence ticket_number_seq;
+DROP SEQUENCE order_number_seq;
+DROP SEQUENCE ticket_number_seq;

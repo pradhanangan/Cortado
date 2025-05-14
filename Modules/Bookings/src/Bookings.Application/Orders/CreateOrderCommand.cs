@@ -1,11 +1,14 @@
 ﻿using Bookings.Application.Common.Exceptions;
 using Bookings.Application.Common.Interfaces;
 using Bookings.Domain.Entities;
+using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Products.Application.Products;
 using Products.Application.Products.Dtos;
 using Products.Domain.Entities;
 using Shared.Common.Abstraction;
+using Shared.Common.Exceptions;
 
 namespace Bookings.Application.Orders;
 
@@ -14,10 +17,17 @@ public record CreateOrderCommand(Guid ProductId, string Email, string PhoneNumbe
 
 public record CreateOrderItem(Guid ProductItemId, int Quantity);
 
-public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ITokenService tokenService, IEmailService emailService, ISender mediatr) : IRequestHandler<CreateOrderCommand, Result<Guid>>
+public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ITokenService tokenService, IEmailService emailService, ISender mediatr, IValidator<CreateOrderCommand> validator) : IRequestHandler<CreateOrderCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
+
+        var validationResult = validator.Validate(request);
+        if (!validationResult.IsValid)
+        {
+            throw new RequestValidationException(validationResult.Errors);
+        }
+
         try
         {
             using var transaction = await bookingsDbContext.BeginTransactionAsync(cancellationToken);
@@ -27,7 +37,7 @@ public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOr
             {
                 throw new NotFoundException(nameof(Product), request.ProductId);
             }
-            
+
             var product = productResult.Value;
 
             // Generate order id
