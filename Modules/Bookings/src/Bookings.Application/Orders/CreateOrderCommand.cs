@@ -3,7 +3,6 @@ using Bookings.Application.Common.Interfaces;
 using Bookings.Domain.Entities;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Products.Application.Products;
 using Products.Application.Products.Dtos;
 using Products.Domain.Entities;
@@ -12,12 +11,26 @@ using Shared.Common.Exceptions;
 
 namespace Bookings.Application.Orders;
 
-public record CreateOrderCommand(Guid ProductId, string Email, string PhoneNumber, string FirstName,
-    string LastName, List<CreateOrderItem> OrderItems, DateTime OrderDate) : IRequest<Result<Guid>>;
+public record CreateOrderCommand(
+    Guid ProductId,
+    string Email,
+    string PhoneNumber,
+    string FirstName,
+    string LastName,
+    List<CreateOrderItem> OrderItems,
+    DateTime OrderDate) : IRequest<Result<Guid>>;
 
-public record CreateOrderItem(Guid ProductItemId, int Quantity);
+public record CreateOrderItem(
+    Guid ProductItemId,
+    int Quantity);
 
-public class CreateOrderCommandHandler(IBookingsDbContext bookingsDbContext, IOrderRepository orderRepository, ITokenService tokenService, IEmailService emailService, ISender mediatr, IValidator<CreateOrderCommand> validator) : IRequestHandler<CreateOrderCommand, Result<Guid>>
+public class CreateOrderCommandHandler(
+    IBookingsDbContext bookingsDbContext,
+    IOrderRepository orderRepository,
+    ITokenService tokenService,
+    IEmailService emailService,
+    ISender mediatr,
+    IValidator<CreateOrderCommand> validator) : IRequestHandler<CreateOrderCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {

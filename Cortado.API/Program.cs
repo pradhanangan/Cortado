@@ -115,6 +115,33 @@ builder.Services.AddAuthentication(options =>
         options.Cookie.Name = "MyCookieAuth";
         options.LoginPath = "/Auth/Login";
         options.AccessDeniedPath = "/Auth/AccessDenied";
+
+        // Cookie authentication, if not logged in it redirects to the login page.
+        // It it's a api request, then do not redirect to login page, return error code with appropriate json
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnRedirectToLogin = context =>
+            {
+                if (IsApiRequest(context.Request))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                }
+                context.Response.Redirect(context.RedirectUri);
+                return Task.CompletedTask;
+            },
+            OnRedirectToAccessDenied = context =>
+            {
+                if (IsApiRequest(context.Request))
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                }
+
+                context.Response.Redirect(context.RedirectUri);
+                return Task.CompletedTask;
+            }
+        };
     })
      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
      {
@@ -176,3 +203,10 @@ app.MapControllers();
 app.MapRazorPages();
 
 app.Run();
+
+static bool IsApiRequest(HttpRequest request)
+{
+    // Adjust based on how your API routes are defined
+    return request.Path.StartsWithSegments("/api") ||
+           request.Headers["Accept"].ToString().Contains("application/json");
+}

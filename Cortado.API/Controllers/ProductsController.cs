@@ -38,6 +38,13 @@ namespace Cortado.API.Controllers
             return result.Value;
         }
 
+        [HttpGet("token")]
+        public async Task<ActionResult<ProductDto>> GetProductByToken([FromQuery] string token)
+        {
+            var result = await Mediator.Send(new GetProductByTokenQuery(token));
+            return result.Value;
+        }
+
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<ProductDto>>> SearchProductsByCode([FromQuery] string code)
         {

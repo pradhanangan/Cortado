@@ -50,17 +50,18 @@ public class CreateModel(ISender mediator) : PageModelBase<CreateModel>
 
         // Convert the file to a byte array or stream (if needed)
         using var memoryStream = new MemoryStream();
-        await Image.CopyToAsync(memoryStream);
-
+        if (Image != null)
+        {
+            await Image.CopyToAsync(memoryStream);
+        }
         
-
         await mediator.Send(new CreateProductCommand(
             customerId.Value,
             Code,
             Name,
             Description,
             memoryStream,
-            Image.FileName,
+            Image?.FileName ?? "",
             Address,
             StartDate,
             EndDate,

@@ -14,7 +14,7 @@ public class Product : BaseAuditableEntity
     public DateOnly EndDate { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
-   
+    public string RegistrationUrl { get; set; } // Combination of registration web app url and token
 
     public ICollection<ProductItem> ProductItems = new List<ProductItem>();
 }
