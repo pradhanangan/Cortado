@@ -1,22 +1,24 @@
-using Shared.Common;
 using Bookings.Application;
 using Bookings.Infrastructure;
+using Cortado.API.Filters;
 using Customers.Application;
 using Customers.Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Products.Application;
-using Products.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System.Net;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Products.Application;
+using Products.Infrastructure;
+using Shared.Common;
 using Shared.Common.Logging;
-using Cortado.API.Filters;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure logging using Shared.Common
@@ -145,28 +147,31 @@ builder.Services.AddAuthentication(options =>
     })
      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
      {
-         options.MapInboundClaims = false;
+         //options.MapInboundClaims = false;
+         options.Authority = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo";
          options.TokenValidationParameters = new TokenValidationParameters
          {
-             IssuerSigningKeyResolver = (s, securityToken, identifier, parameters) =>
-             {
-                 // get JsonWebKeySet from AWS 
-                 var json = new WebClient().DownloadString("https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo/.well-known/jwks.json");
+             //IssuerSigningKeyResolver = (s, securityToken, identifier, parameters) =>
+             //{
+             //    // get JsonWebKeySet from AWS 
+             //    var json = new WebClient().DownloadString("https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo/.well-known/jwks.json");
 
-                 // serialize the result 
-                 var keys = JsonConvert.DeserializeObject<JsonWebKeySet>(json).Keys;
+             //    // serialize the result 
+             //    var keys = JsonConvert.DeserializeObject<JsonWebKeySet>(json).Keys;
 
-                 // cast the result to be the type expected by IssuerSigningKeyResolver 
-                 return (IEnumerable<SecurityKey>)keys;
-             },
+             //    // cast the result to be the type expected by IssuerSigningKeyResolver 
+             //    return (IEnumerable<SecurityKey>)keys;
+             //},
              ValidateIssuer = true,
              ValidateAudience = false,
              ValidateLifetime = true,
              ValidateIssuerSigningKey = true,
              ValidIssuer = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo",
+             NameClaimType = "sub",
              RoleClaimType = "cognito:groups",
              //NameClaimType ="sub"
              //ValidAudience = "7qin2t9mgeicjmtpe3lcv0ae9s"     // Cognito App Client Id
+
              //AudienceValidator = (audiences, securityToken, validationParameters) =>
              //{
              //    //This is necessary because Cognito tokens doesn't have "aud" claim. Instead the audience is set in "client_id"
@@ -174,6 +179,16 @@ builder.Services.AddAuthentication(options =>
              //}
          };
          //options.MetadataAddress = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo/.well-known/jwks.json";
+         options.Events = new JwtBearerEvents
+         {
+             OnTokenValidated = context =>
+             {
+                 var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                 var claims = context.Principal.Claims.Select(c => $"{c.Type}: {c.Value}");
+                 logger.LogInformation("Token validated with claims:\n{Claims}", string.Join("\n", claims));
+                 return Task.CompletedTask;
+             }
+         };
      });
 
 //builder.WebHost.UseUrls("http://*:5000");

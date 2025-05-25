@@ -27,14 +27,7 @@ namespace Cortado.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> Get(Guid id)
         {
-           var result = await Mediator.Send(new GetProductByIdQuery(id));
-           return result.Value;
-        }
-
-        [HttpGet("code")]
-        public async Task<ActionResult<ProductDto>> GetProductByCode([FromQuery] string code)
-        {
-            var result = await Mediator.Send(new GetProductByCodeQuery(code));
+            var result = await Mediator.Send(new GetProductByIdQuery(id));
             return result.Value;
         }
 
@@ -42,6 +35,13 @@ namespace Cortado.API.Controllers
         public async Task<ActionResult<ProductDto>> GetProductByToken([FromQuery] string token)
         {
             var result = await Mediator.Send(new GetProductByTokenQuery(token));
+            return result.Value;
+        }
+
+        [HttpGet("code")]
+        public async Task<ActionResult<ProductDto>> GetProductByCode([FromQuery] string code)
+        {
+            var result = await Mediator.Send(new GetProductByCodeQuery(code));
             return result.Value;
         }
 
@@ -53,7 +53,8 @@ namespace Cortado.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Guid>> Post(CreateProductRequest request)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<Guid>> Post([FromForm] CreateProductRequest request)
         {
             var customerId = await GetCustomerIdAsync();
             if (customerId == null)
@@ -91,6 +92,19 @@ namespace Cortado.API.Controllers
                 request.UnitPrice
             ));
             return result.Value;
+        }
+
+        // GET: /api/users/me/products
+        [HttpGet("/api/users/me/products")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCustomerId()
+        {
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+            var products = await Mediator.Send(new GetProductsByCustomerIdQuery(customerId.Value));
+            return Ok(products.Value);
         }
     }
 }

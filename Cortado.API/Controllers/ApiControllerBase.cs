@@ -1,6 +1,7 @@
 ﻿using Customers.Application.Customers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Cortado.API.Controllers;
 
@@ -26,7 +27,7 @@ public abstract class ApiControllerBase<T> : ControllerBase where T : Controller
     protected async Task<Guid?> GetCustomerIdAsync()
     {
        
-        var sub = User.FindFirst("sub")?.Value;
+        var sub = User.FindFirst("sub")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(sub))
         {
