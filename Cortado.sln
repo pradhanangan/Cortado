@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{6978DE6B-0BEE-4D86-B42D-A4F6E418C146}"
 	ProjectSection(SolutionItems) = preProject
-		00_DropAll.sql = 00_DropAll.sql
+		sql\00_DropAll.sql = sql\00_DropAll.sql
 		sql\01_CustomerModule.sql = sql\01_CustomerModule.sql
 		sql\02_ProductModule.sql = sql\02_ProductModule.sql
 		sql\03_BookingModule.sql = sql\03_BookingModule.sql
@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{6978DE6B-0BE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api-tests", "api-tests", "{8F860659-CBA2-4480-B63F-1D8D7E2EB612}"
 	ProjectSection(SolutionItems) = preProject
-		BookingsApiTest.http = BookingsApiTest.http
+		api-tests\BookingsApiTest.http = api-tests\BookingsApiTest.http
 		api-tests\IdentitiesApiTest.http = api-tests\IdentitiesApiTest.http
 		api-tests\MembersApiTest.http = api-tests\MembersApiTest.http
 		api-tests\UsersApiTest.http = api-tests\UsersApiTest.http

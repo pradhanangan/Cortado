@@ -25,6 +25,9 @@ public static class ConfigureServices
         });
 
         // Register other services
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
         services.AddSingleton<IUserManagement, CognitoUserManagement>();
         services.AddScoped<ITokenParser, TokenParser>();
         services.AddSingleton<IStorageService, S3StorageService>();

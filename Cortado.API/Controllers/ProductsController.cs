@@ -15,6 +15,14 @@ namespace Cortado.API.Controllers
     public class ProductsController: ApiControllerBase<ProductsController>
     {
         [AllowAnonymous]
+        [HttpGet("token")]
+        public async Task<ActionResult<ProductDto>> GetProductByToken([FromQuery] string token)
+        {
+            var result = await Mediator.Send(new GetProductByTokenQuery(token));
+            return result.Value;
+        }
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> Get()
         {
@@ -30,14 +38,7 @@ namespace Cortado.API.Controllers
             var result = await Mediator.Send(new GetProductByIdQuery(id));
             return result.Value;
         }
-
-        [HttpGet("token")]
-        public async Task<ActionResult<ProductDto>> GetProductByToken([FromQuery] string token)
-        {
-            var result = await Mediator.Send(new GetProductByTokenQuery(token));
-            return result.Value;
-        }
-
+        
         [HttpGet("code")]
         public async Task<ActionResult<ProductDto>> GetProductByCode([FromQuery] string code)
         {
