@@ -17,7 +17,7 @@ public class IndexModel(ISender mediator) : PageModelBase<IndexModel>
         {
             return;
         }
-        var allProductsResult = await mediator.Send(new GetProductsByCustomerIdQuery(customerId.Value));
+        var allProductsResult = await mediator.Send(new GetProductsQuery(customerId.Value));
         Products = allProductsResult.Value;
     }
 }

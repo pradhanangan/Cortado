@@ -1,4 +1,5 @@
 ﻿using Cortado.API.Contracts;
+using Cortado.API.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -19,19 +20,22 @@ namespace Cortado.API.Controllers
         public async Task<ActionResult<ProductDto>> GetProductByToken([FromQuery] string token)
         {
             var result = await Mediator.Send(new GetProductByTokenQuery(token));
-            return result.Value;
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ToProblemDetails());
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> Get()
         {
             Logger.LogInformation("{Controller} called", nameof(ProductsController));
-            var products = await Mediator.Send(new GetProductsQuery());
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+            var products = await Mediator.Send(new GetProductsQuery(customerId.Value));
             return Ok(products.Value);
         }
 
-        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> Get(Guid id)
         {
@@ -93,19 +97,6 @@ namespace Cortado.API.Controllers
                 request.UnitPrice
             ));
             return result.Value;
-        }
-
-        // GET: /api/users/me/products
-        [HttpGet("/api/users/me/products")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCustomerId()
-        {
-            var customerId = await GetCustomerIdAsync();
-            if (customerId == null)
-            {
-                return Unauthorized("Customer not found.");
-            }
-            var products = await Mediator.Send(new GetProductsByCustomerIdQuery(customerId.Value));
-            return Ok(products.Value);
         }
     }
 }

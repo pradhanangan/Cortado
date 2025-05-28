@@ -10,6 +10,7 @@ public class CreateProductItemCommandValidator : AbstractValidator<CreateProduct
         RuleFor(x => x.Name).NotEmpty();
         RuleFor(x => x.Description).NotEmpty();
         RuleFor(x => x.Variants).NotEmpty();
-        RuleFor(x => x.UnitPrice).NotEmpty();
+       
+        RuleFor(x => x.UnitPrice).NotEmpty().When(x => !x.IsFree);
     }
 }
