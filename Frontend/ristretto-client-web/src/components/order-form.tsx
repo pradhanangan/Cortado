@@ -34,6 +34,7 @@ export default function OrderForm({ product }: OrderFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [success, setSuccess] = useState(false);
+
   const [totalTickets, setTotalTickets] = useState(0);
   const { mapOrderDtoToOrderRequest } = useOrderUtils();
 
@@ -163,10 +164,10 @@ export default function OrderForm({ product }: OrderFormProps) {
     //   return;
     // }
 
-    debugger;
     const order: OrderDto = {
       productId: formValues.productId as string,
       email: formValues.email as string,
+
       phoneNumber: formValues.phone as string,
       firstName: formValues.firstName as string,
       lastName: formValues.lastName as string,
@@ -197,6 +198,32 @@ export default function OrderForm({ product }: OrderFormProps) {
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, sm: 9 }}>
             <Grid container spacing={3}>
+              <Box width={"100%"}>
+                <Typography variant="h6">Get Your Tickets</Typography>
+              </Box>
+
+              {product?.productItems.map((item, index) => (
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: getGridMdValue(product.productItems.length),
+                  }}
+                  key={index}
+                >
+                  <TextField
+                    id={item.id}
+                    name={item.id}
+                    type="number"
+                    placeholder="0"
+                    label={item.variants}
+                    size="small"
+                    fullWidth
+                    inputRef={(el) => (productItemRefs.current[index] = el)}
+                    onChange={handleProductItemChange}
+                  />
+                </Grid>
+              ))}
+
               <Box width={"100%"}>
                 <Typography variant="h6">Personal Details</Typography>
               </Box>
@@ -252,30 +279,6 @@ export default function OrderForm({ product }: OrderFormProps) {
                   fullWidth
                 />
               </Grid>
-              <Box width={"100%"}>
-                <Typography variant="h6">Number of Tickets *</Typography>
-              </Box>
-              {product?.productItems.map((item, index) => (
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: getGridMdValue(product.productItems.length),
-                  }}
-                  key={index}
-                >
-                  <TextField
-                    id={item.id}
-                    name={item.id}
-                    type="number"
-                    placeholder="0"
-                    label={item.variants}
-                    size="small"
-                    fullWidth
-                    inputRef={(el) => (productItemRefs.current[index] = el)}
-                    onChange={handleProductItemChange}
-                  />
-                </Grid>
-              ))}
 
               {/* <ReCAPTCHA
                 ref={recaptchaRef}

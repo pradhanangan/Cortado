@@ -1,13 +1,11 @@
 export interface OrderDto {
-  orderItems: OrderItemDto[];
   productId: string;
   email: string;
   phoneNumber: string;
   firstName: string;
   lastName: string;
-  totalPrice: number;
   orderDate: Date;
-  isPaid: boolean;
+  orderItems: OrderItemDto[];
 }
 
 export interface OrderItemDto {
@@ -15,6 +13,7 @@ export interface OrderItemDto {
   name: string;
   unitPrice: number;
   quantity: number;
+  // price: number;
 }
 
 export type PaymentStatus =
@@ -45,7 +44,16 @@ export interface OrderRequest {
   phoneNumber: string;
   firstName: string;
   lastName: string;
-  isPaid: boolean;
+  orderDate: Date;
+  orderItems: OrderItemRequest[];
+}
+
+export interface OrderWithPaymentRequest {
+  productId: string;
+  email: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
   orderDate: Date;
   orderItems: OrderItemRequest[];
   paymentId: string;

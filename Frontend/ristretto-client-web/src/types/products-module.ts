@@ -12,4 +12,5 @@ export interface ProductItem {
   description: string;
   variants: string;
   unitPrice: number;
+  isFree: boolean;
 }

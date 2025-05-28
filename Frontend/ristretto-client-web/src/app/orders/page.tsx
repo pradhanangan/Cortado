@@ -1,59 +1,62 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Box, Container } from "@mui/material";
+
+import ProductDetail from "@/components/product-detail";
+import TicketSelection from "@/components/ticket-selection";
+import OrderError from "@/components/order-error";
+import { ProductService } from "@/services/product-service";
 import { Product } from "@/types/products-module";
-import OrderForm from "@/components/order-form";
+import { PRODUCT_ERRORS } from "@/constants/product-constant";
+
+const ERROR_MESSAGES = {
+  TOKEN_MISSING:
+    "Something's missing in the link. It may have been broken or copied incorrectly.",
+  TOKEN_EXPIRED: "Looks like this link has expired or is no longer valid.",
+  DEFAULT: "Oops! Something went wrong. Please try again.",
+};
+
 export default function OrdersPage() {
-  const [productId, setProductId] = useState("");
+  const searchParams = useSearchParams();
   const [product, setProduct] = useState<Product | null>(null);
-  const router = useRouter();
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const token = searchParams.get("et") || "";
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const productId = searchParams.get("productId") || "";
-    if (!productId) {
-      router.push("/errors");
-    } else {
-      setProductId(productId);
+    if (!token) {
+      setErrorMsg(ERROR_MESSAGES.TOKEN_MISSING);
+      return;
     }
-  }, [router]);
 
-  useEffect(() => {
     const fetchProduct = async () => {
-      if (!productId) return;
       try {
-        const response = await fetch(
-          `https://localhost:7159/api/products/${productId}`,
-          {
-            method: "GET",
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (data.productItems.length === 0) {
-            throw new Error("Product has no items");
-          }
-          setProduct(data);
-        } else {
-          throw new Error("Failed to fetch products");
-        }
+        const data = await ProductService.getProductByToken(token);
+        setProduct(data);
+        setErrorMsg("");
       } catch (error) {
         console.error(error);
-        router.push("/errors");
+        setErrorMsg(
+          error instanceof Error &&
+            error.message === PRODUCT_ERRORS.TOKEN_EXPIRED
+            ? ERROR_MESSAGES.TOKEN_EXPIRED
+            : ERROR_MESSAGES.DEFAULT
+        );
       }
     };
     fetchProduct();
-  }, [productId]);
+  }, [token]);
 
-  if (!product) {
-    return;
-  }
   return (
     <Box>
-      <Container>
-        <OrderForm product={product} />
-      </Container>
+      {product && (
+        <Container>
+          <ProductDetail product={product} />
+          <TicketSelection product={product} />
+        </Container>
+      )}
+      {errorMsg && <OrderError message={errorMsg} />}
     </Box>
   );
 }

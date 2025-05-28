@@ -4,7 +4,7 @@ import { useStripe, Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Backdrop, Button, CircularProgress, Container } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { OrderDto, PaymentStatus } from "@/types/orders-module";
+import { PaymentStatus } from "@/types/orders-module";
 import OrderPaymentComplete from "@/components/order-payment-complete";
 import { useOrder } from "@/hooks/useOrder";
 import { useStripePayment } from "@/hooks/useStripePayment";
@@ -17,10 +17,10 @@ const stripePromise = loadStripe(
 function PaymentCompleteContent() {
   const stripe = useStripe();
   const router = useRouter();
-  const { createOrderWithPayment } = useOrder();
+  const { markAsPaid } = useOrder();
   const { retrievePaymentIntent } = useStripePayment();
   const [loading, setLoading] = useState(true);
-  const [order, setOrder] = useState<OrderDto | null>(null);
+  const [productId, setProductId] = useState<string>("");
   const [status, setStatus] = useState<PaymentStatus>("default");
   // const hasInitialized = useRef(false); // Track if the effect has already run
 
@@ -33,23 +33,22 @@ function PaymentCompleteContent() {
         }
 
         const searchParams = new URLSearchParams(window.location.search);
-        const encodedData = searchParams.get("data");
+        const orderId = searchParams.get("orderId");
+        const productId = searchParams.get("productId");
         const clientSecret = searchParams.get("payment_intent_client_secret");
 
-        if (!encodedData || !clientSecret) {
+        if (!orderId || !productId || !clientSecret) {
           throw new Error("Missing required parameters in URL");
         }
 
-        // Decode order data only once
-        const decodedData = JSON.parse(atob(encodedData));
-        setOrder(decodedData);
+        setProductId(productId);
 
         const paymentIntent = await retrievePaymentIntent(stripe, clientSecret);
         if (!paymentIntent) return;
 
         if (paymentIntent.status === "succeeded") {
           try {
-            await createOrderWithPayment(paymentIntent.id, decodedData);
+            await markAsPaid(orderId, paymentIntent.id);
             setStatus(paymentIntent.status as PaymentStatus);
           } catch (error) {
             console.error("Error creating order:", error);
@@ -92,7 +91,7 @@ function PaymentCompleteContent() {
         variant="contained"
         color="primary"
         onClick={() =>
-          window.location.replace(`/orders?productId=${order?.productId}`)
+          window.location.replace(`/orders?productId=${productId}`)
         }
       >
         New Order
