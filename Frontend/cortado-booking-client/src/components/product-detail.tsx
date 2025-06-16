@@ -5,7 +5,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
-import { Product } from "@/types/products-module";
+import { Product } from "@/types/product-type";
 import { formatDate, formatTime } from "@/utils/date-utils";
 interface ProductDetailProps {
   product: Product | null;

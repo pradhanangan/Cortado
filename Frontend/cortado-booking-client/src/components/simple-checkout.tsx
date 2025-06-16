@@ -16,7 +16,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { amber } from "@mui/material/colors";
 
 import { OrderService } from "@/services/order-service";
-import { OrderDto, OrderItemDto } from "@/types/orders-module";
+import { OrderDto, OrderItemDto } from "@/types/order-type";
 
 interface SimpleCheckoutProps {
   productId: string;
@@ -35,7 +35,7 @@ export function SimpleCheckout({
   total,
   onBack,
 }: SimpleCheckoutProps) {
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
@@ -60,7 +60,7 @@ export function SimpleCheckout({
     };
 
     try {
-      const orderId = await OrderService.createOrder(order);
+      const orderId = await OrderService.createOrderWithEmail(order);
     } catch (error) {
       setErrorMsg(
         "Something went wrong while placing your order. Please try again later."
@@ -207,7 +207,7 @@ export function SimpleCheckout({
               </Card>
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {subtotal > 0 && (
+                {/* {subtotal > 0 && (
                   <Box
                     sx={{
                       display: "flex",
@@ -221,7 +221,7 @@ export function SimpleCheckout({
                       ${serviceFee.toFixed(2)}
                     </Typography>
                   </Box>
-                )}
+                )} */}
                 <Divider />
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>

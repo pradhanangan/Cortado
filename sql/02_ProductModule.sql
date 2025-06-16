@@ -17,7 +17,8 @@
     last_modified_by VARCHAR(40) NOT NULL,
     last_modified_date TIMESTAMP WITH TIME ZONE,
     CONSTRAINT pk_products PRIMARY KEY(id),
-    CONSTRAINT fk_products_customers_id FOREIGN KEY(customer_id) REFERENCES customers(id) ON DELETE CASCADE
+    CONSTRAINT fk_products_customers_id FOREIGN KEY(customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+    CONSTRAINT uq_products_customer_id_code UNIQUE (customer_id, code)
 );
 
 CREATE TABLE product_items

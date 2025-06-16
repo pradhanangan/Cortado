@@ -20,10 +20,16 @@ public class VerifyOrderCommandHandler(IBookingsDbContext bookingDbContext, ITok
             (orderId, email) = tokenService.ValidateBookingVerificationToken(request.Token);
         }
         catch (Exception ex)
-        //when (ex is TokenExpiredException)
         {
-            throw;
-            //return new VerifyBookingResponse(VerifyBookingStatus.TokenExpired);
+            switch (ex)
+            {
+                case TokenExpiredException:
+                    return new VerifyOrderResponse(VerifyBookingStatus.TokenExpired);
+                case MissingClaimException:
+                    return Result.Failure<VerifyOrderResponse>(new Error("Token.MissingClaim", "The token is missing the required claim `BookingId or Email`"));
+                default:
+                    return Result.Failure<VerifyOrderResponse>(new Error("Token.UnknownError", "An unknown error occurred while validating the token."));
+            }
         }
 
         var order = bookingDbContext.Set<Order>().Single(b => b.Id == Guid.Parse(orderId));
@@ -35,11 +41,10 @@ public class VerifyOrderCommandHandler(IBookingsDbContext bookingDbContext, ITok
 
         if (order.IsVerified == true)
         {
-            //throw new BadRequestException("Email already verified");
             return new VerifyOrderResponse(VerifyBookingStatus.AlreadyVerified);
         }
 
-       order.IsVerified = true;
+        order.IsVerified = true;
         await bookingDbContext.SaveChangesAsync(cancellationToken);
 
         return new VerifyOrderResponse(VerifyBookingStatus.Verified);

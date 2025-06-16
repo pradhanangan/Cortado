@@ -16,6 +16,6 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
         RuleFor(x => x.EndDate).NotEmpty();
         RuleFor(x => x.EndTime).NotEmpty();
         RuleFor(x => x.EndDate.ToDateTime(x.EndTime))
-            .GreaterThanOrEqualTo(x => x.StartDate.ToDateTime(x.StartTime));
+            .GreaterThan(x => x.StartDate.ToDateTime(x.StartTime));
     }
 }

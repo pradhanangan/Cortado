@@ -46,14 +46,26 @@ namespace Cortado.API.Controllers
         [HttpGet("code")]
         public async Task<ActionResult<ProductDto>> GetProductByCode([FromQuery] string code)
         {
-            var result = await Mediator.Send(new GetProductByCodeQuery(code));
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+
+            var result = await Mediator.Send(new GetProductByCodeQuery(customerId.Value, code));
             return result.Value;
         }
 
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<ProductDto>>> SearchProductsByCode([FromQuery] string code)
         {
-            var result = await Mediator.Send(new SearchProductsByCodeQuery(code));
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+
+            var result = await Mediator.Send(new SearchProductsByCodeQuery(customerId.Value, code));
             return result.Value;
         }
 
@@ -68,7 +80,7 @@ namespace Cortado.API.Controllers
             }
             
             using var imgStream = request.Image.OpenReadStream();
-            var productId = await Mediator.Send(new CreateProductCommand(
+            var result = await Mediator.Send(new CreateProductCommand(
                 customerId.Value,
                 request.Code,
                 request.Name,
@@ -81,7 +93,7 @@ namespace Cortado.API.Controllers
                 request.StartTime,
                 request.EndTime
             ));
-            return CreatedAtAction(nameof(Post), productId);
+            return result.IsSuccess ? CreatedAtAction(nameof(Post), result.Value) : BadRequest(result.ToProblemDetails());
         }
 
         [HttpPost]
@@ -96,7 +108,7 @@ namespace Cortado.API.Controllers
                 request.IsFree,
                 request.UnitPrice
             ));
-            return result.Value;
+            return result.IsSuccess ? CreatedAtAction(nameof(Post), result.Value) : BadRequest(result.ToProblemDetails());
         }
     }
 }

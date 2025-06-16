@@ -9,7 +9,7 @@ using Shared.Common.Abstraction;
 
 namespace Products.Application.Products;
 
-public record GetProductByCodeQuery(string Code) : IRequest<Result<ProductDto>>;
+public record GetProductByCodeQuery(Guid CustomerId, string Code) : IRequest<Result<ProductDto>>;
 
 public class GetProductByCodeQueryHandler(IProductDbContext dbContext) : IRequestHandler<GetProductByCodeQuery, Result<ProductDto>>
 {
@@ -17,7 +17,7 @@ public class GetProductByCodeQueryHandler(IProductDbContext dbContext) : IReques
     {
         var product = await dbContext.Set<Product>()
            .Include(p => p.ProductItems)
-           .FirstOrDefaultAsync(p => p.Code.ToLower() ==  request.Code.ToLower());
+           .FirstOrDefaultAsync(p => p.CustomerId == request.CustomerId && p.Code.ToLower() ==  request.Code.ToLower());
 
         if (product is null)
         {

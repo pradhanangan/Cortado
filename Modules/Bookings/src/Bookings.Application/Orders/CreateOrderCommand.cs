@@ -27,8 +27,6 @@ public record CreateOrderItem(
 public class CreateOrderCommandHandler(
     IBookingsDbContext bookingsDbContext,
     IOrderRepository orderRepository,
-    ITokenService tokenService,
-    IEmailService emailService,
     ISender mediatr,
     IValidator<CreateOrderCommand> validator) : IRequestHandler<CreateOrderCommand, Result<Guid>>
 {
@@ -84,13 +82,6 @@ public class CreateOrderCommandHandler(
             // Commit the transaction
             await transaction.CommitAsync(cancellationToken);
 
-            var token = tokenService.GenerateBookingVerificationToken(order.Id.ToString(), order.Email);
-
-            var url = $"http://localhost:3000/orders/verify?token={token}";
-            var htmlContent = $"<p>Dear {order.FirstName}</p><p>Thank you for requesting ticket(s) for the event <b>{product.Name}</b>. Please verify you order by clicking the link below:</p><a href='{url}'>Verify your email address</a><p>Regards, <br/>NNZWFS</p>";
-
-            // Send email to the user to verify their email address
-            await emailService.SendEmailAsync(order.Email, "Verify your email address", htmlContent);
             return order.Id;
         }
         catch (Exception e) { throw; }

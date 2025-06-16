@@ -12,4 +12,4 @@ CREATE TABLE customers (
 
 INSERT INTO customers (
 	id, username, email, identity_id, created_by, created_date, last_modified_by, last_modified_date)
-	VALUES (gen_random_uuid(), 'admin@ristretto.com', 'admin@ristretto.com', '1df3085c-de4c-4989-bc5f-2544bd4b9aa6', 'system', NOW(), 'system', NOW());
+	VALUES (gen_random_uuid(), 'admin@cortado.com', 'admin@cortado.com', '59fec4c8-30b1-7099-efe3-0f9b3a241617', 'system', NOW(), 'system', NOW());

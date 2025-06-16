@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Products.Application.Common.Configurations;
 using Products.Application.Common.Interfaces;
@@ -82,8 +83,28 @@ public class CreateProductCommandHandler(
         };
         dbContext.Add(product);
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
+        {
+            return Result.Failure<Guid>(new Error("Product.CodeExists", "A product with the same code already exists."));
+        }
         
         return product.Id;
+    }
+
+    private static bool IsUniqueConstraintViolation(DbUpdateException ex)
+    {
+        if (ex.InnerException.Message.Contains("uq_products_customer_id_code", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+        //if (ex.InnerException is PostgresException pgEx)
+        //{
+        //    return pgEx.SqlState == "23505";
+        //}
+        return false;
     }
 }

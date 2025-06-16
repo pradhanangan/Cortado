@@ -43,3 +43,15 @@ export function formatTime(time24: string): string {
   // Format the time string with padding for minutes
   return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
 }
+
+export function encryptTimestamp(timestamp: number): string {
+  // Convert timestamp to base64 and add some obfuscation
+  const encoded = Buffer.from(timestamp.toString()).toString("base64");
+  return encoded.split("").reverse().join("");
+}
+
+export function decryptTimestamp(encrypted: string): number {
+  // Reverse the obfuscation and decode base64
+  const decoded = Buffer.from(encrypted.split("").reverse().join(""), "base64");
+  return parseInt(decoded.toString());
+}

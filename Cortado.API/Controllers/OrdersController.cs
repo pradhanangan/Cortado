@@ -1,9 +1,11 @@
 ﻿using Bookings.Application.Orders;
 using Bookings.Application.Orders.Dtos;
-using Microsoft.AspNetCore.Mvc;
 using Cortado.API.Contracts;
+using Cortado.API.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Shared.Common.Abstraction;
 
 namespace Cortado.API.Controllers;
 
@@ -32,7 +34,23 @@ public class OrdersController : ApiControllerBase<OrdersController>
             request.OrderItems.Select(item => new CreateOrderItem(item.ProductItemId, item.Quantity)).ToList(),
             request.OrderDate
         ));
-        return CreatedAtAction(nameof(Post), response);
+        return CreatedAtAction(nameof(Post), response.Value);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("with-email")]
+    public async Task<ActionResult<Guid>> CreateOrderWithEmail(CreateOrderRequest request)
+    {
+        var response = await Mediator.Send(new CreateOrderWithEmailCommand(
+            request.ProductId,
+            request.Email,
+            request.PhoneNumber,
+            request.FirstName,
+            request.LastName,
+            request.OrderItems.Select(item => new CreateOrderItem(item.ProductItemId, item.Quantity)).ToList(),
+            request.OrderDate
+        ));
+        return CreatedAtAction(nameof(Post), response.Value);
     }
 
     [AllowAnonymous]
@@ -49,7 +67,7 @@ public class OrdersController : ApiControllerBase<OrdersController>
             request.OrderItems.Select(item => new CreateOrderItem(item.ProductItemId, item.Quantity)).ToList(),
             request.PaymentId
         ));
-        return CreatedAtAction(nameof(Post), response);
+        return CreatedAtAction(nameof(Post), response.Value);
     }
 
     [HttpPut]
@@ -72,8 +90,8 @@ public class OrdersController : ApiControllerBase<OrdersController>
     [HttpGet("verify-order")]
     public async Task<ActionResult<VerifyOrderResponse>> VerifyOrder(string token)
     {
-        var response = await Mediator.Send(new VerifyOrderCommand(token));
-        return Ok(response);
+        var result = await Mediator.Send(new VerifyOrderCommand(token));
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ToProblemDetails());
     }
 
     [HttpPut("{orderId}/mark-as-verified")]

@@ -1,18 +1,18 @@
 "use client";
-
-import type React from "react";
-
 import { useEffect, useState } from "react";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import Divider from "@mui/material/Divider";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { amber } from "@mui/material/colors";
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Typography,
+  TextField,
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 import { useStripePayment } from "@/hooks/useStripePayment";
 import {
   Elements,
@@ -21,8 +21,10 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { OrderDto, OrderItemDto } from "@/types/orders-module";
-import { useOrder } from "@/hooks/useOrder";
+import { OrderDto, OrderItemDto } from "@/types/order-type";
+import { OrderService } from "@/services/order-service";
+import { encryptTimestamp } from "@/utils/date-utils";
+
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
@@ -46,8 +48,8 @@ export function CheckoutForm({
 }: SimpleCheckoutProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const { createOrder } = useOrder();
 
+  const [errorMsg, setErrorMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -57,6 +59,7 @@ export function CheckoutForm({
       return;
     }
 
+    setErrorMsg("");
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
@@ -72,31 +75,61 @@ export function CheckoutForm({
       orderItems: orderItems.filter((t) => t.quantity > 0),
     };
 
-    const orderId = await createOrder(order);
-    console.log("Order ID:", orderId);
-    debugger;
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `http://localhost:3000/orders/payments/complete?orderId=${orderId}&productId=${productId}`,
-        payment_method_data: {
-          billing_details: {
-            email: formValues.email as string,
-            name: `${formValues.firstName} ${formValues.lastName}`,
-            phone: formValues.phone as string,
-            address: {
-              country: "NZ",
+    try {
+      const orderId = await OrderService.createOrder(order);
+      debugger;
+      if (!orderId) {
+        setErrorMsg("Failed to create order. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const returnUrl = encodeURIComponent(window.location.href);
+      const timestamp = encryptTimestamp(Date.now());
+      debugger;
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `http://localhost:3000/orders/payments/complete?oid=${orderId}&bak=${returnUrl}&ts=${timestamp}`,
+          payment_method_data: {
+            billing_details: {
+              email: formValues.email as string,
+              name: `${formValues.firstName} ${formValues.lastName}`,
+              phone: formValues.phone as string,
+              address: {
+                country: "NZ",
+              },
             },
           },
         },
-      },
-    });
-
-    if (error) {
-      console.error(error);
+        // redirect: "if_required",
+      });
+      debugger;
+      if (error) {
+        console.error(error);
+        setIsSubmitting(false);
+      }
+      // if (paymentIntent && paymentIntent.status === "succeeded") {
+      //   const result = await stripe.retrievePaymentIntent(
+      //     paymentIntent.client_secret!
+      //   );
+      //   console.log("retrievePaymentIntent result:", {
+      //     hasError: !!result.error,
+      //     hasPaymentIntent: !!result.paymentIntent,
+      //     status: result.paymentIntent?.status,
+      //   });
+      //   // Redirect to success page or show success message
+      //   window.location.href = `/orders/payments/complete?orderId=${orderId}&productId=${productId}`;
+      // } else {
+      //   setErrorMsg("Payment failed. Please try again.");
+      //   setIsSubmitting(false);
+      // }
+    } catch (error) {
+      setErrorMsg(
+        "Something went wrong while placing your order. Please try again later."
+      );
       setIsSubmitting(false);
     }
-    // No need for else case as successful payment will redirect
   };
 
   if (!stripe || !elements) {
@@ -160,7 +193,7 @@ export function CheckoutForm({
               </Card>
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {subtotal > 0 && (
+                {/* {subtotal > 0 && (
                   <Box
                     sx={{
                       display: "flex",
@@ -174,7 +207,7 @@ export function CheckoutForm({
                       ${serviceFee.toFixed(2)}
                     </Typography>
                   </Box>
-                )}
+                )} */}
                 <Divider />
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
@@ -186,6 +219,7 @@ export function CheckoutForm({
                 </Box>
               </Box>
             </Box>
+
             <Grid container spacing={3}>
               <Grid size={{ xs: 12 }}>
                 <TextField
@@ -213,6 +247,7 @@ export function CheckoutForm({
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
+                  required
                   id="firstName"
                   name="firstName"
                   type="text"
@@ -224,6 +259,7 @@ export function CheckoutForm({
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
+                  required
                   id="lastName"
                   name="lastName"
                   type="text"
@@ -234,6 +270,7 @@ export function CheckoutForm({
                 />
               </Grid>
             </Grid>
+
             <PaymentElement
               options={{
                 fields: {
@@ -264,6 +301,8 @@ export function CheckoutForm({
             <Typography variant="caption" color="text.secondary" align="center">
               All sales are final. No refunds or exchanges.
             </Typography>
+
+            {errorMsg && <Alert severity="error">{errorMsg}</Alert>}
           </Box>
         </CardContent>
       </Card>

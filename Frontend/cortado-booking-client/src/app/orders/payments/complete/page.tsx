@@ -1,76 +1,19 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
-import { useStripe, Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
-import { Backdrop, Button, CircularProgress, Container } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { PaymentStatus } from "@/types/orders-module";
-import OrderPaymentComplete from "@/components/order-payment-complete";
-import { useOrder } from "@/hooks/useOrder";
-import { useStripePayment } from "@/hooks/useStripePayment";
+import {
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+} from "@mui/material";
 
-// Initialize Stripe outside component to prevent re-initialization
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
+import OrderPaymentComplete from "@/components/order-payment-complete";
+import OrderError from "@/components/order-error";
+
+import { usePaymentComplete } from "@/hooks/usePaymentComplete";
 
 function PaymentCompleteContent() {
-  const stripe = useStripe();
-  const router = useRouter();
-  const { markAsPaid } = useOrder();
-  const { retrievePaymentIntent } = useStripePayment();
-  const [loading, setLoading] = useState(true);
-  const [productId, setProductId] = useState<string>("");
-  const [status, setStatus] = useState<PaymentStatus>("default");
-  // const hasInitialized = useRef(false); // Track if the effect has already run
-
-  useEffect(() => {
-    const initializePayment = async () => {
-      try {
-        if (!stripe) {
-          console.log("Stripe is not initialized");
-          return;
-        }
-
-        const searchParams = new URLSearchParams(window.location.search);
-        const orderId = searchParams.get("orderId");
-        const productId = searchParams.get("productId");
-        const clientSecret = searchParams.get("payment_intent_client_secret");
-
-        if (!orderId || !productId || !clientSecret) {
-          throw new Error("Missing required parameters in URL");
-        }
-
-        setProductId(productId);
-
-        const paymentIntent = await retrievePaymentIntent(stripe, clientSecret);
-        if (!paymentIntent) return;
-
-        if (paymentIntent.status === "succeeded") {
-          try {
-            await markAsPaid(orderId, paymentIntent.id);
-            setStatus(paymentIntent.status as PaymentStatus);
-          } catch (error) {
-            console.error("Error creating order:", error);
-            router.push("/errors");
-          }
-        } else {
-          console.error("Payment was not successful:", paymentIntent.status);
-          setStatus(paymentIntent.status as PaymentStatus);
-        }
-      } catch (error) {
-        console.error("Error initializing payment:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Run the effect only once
-    // if (!hasInitialized.current) {
-    //   hasInitialized.current = true;
-    initializePayment();
-    // }
-  }, [stripe, router]);
+  const { loading, errorMsg, status, returnUrl } = usePaymentComplete();
 
   if (loading) {
     return (
@@ -83,19 +26,22 @@ function PaymentCompleteContent() {
     );
   }
 
+  if (errorMsg) {
+    return <OrderError message={errorMsg} />;
+  }
+
   return (
     <Container>
       <OrderPaymentComplete status={status} />
-      <br />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() =>
-          window.location.replace(`/orders?productId=${productId}`)
-        }
-      >
-        New Order
-      </Button>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => window.location.replace(decodeURIComponent(returnUrl))}
+        >
+          New Order
+        </Button>
+      </Box>
     </Container>
   );
 }
@@ -103,9 +49,7 @@ function PaymentCompleteContent() {
 export default function CompletePage() {
   return (
     <Container>
-      <Elements stripe={stripePromise}>
-        <PaymentCompleteContent />
-      </Elements>
+      <PaymentCompleteContent />
     </Container>
   );
 }

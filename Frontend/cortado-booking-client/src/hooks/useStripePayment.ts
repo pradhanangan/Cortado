@@ -29,15 +29,22 @@ export function useStripePayment() {
         // console.error("Stripe is not initialized");
         // return;
       }
+      debugger;
+      const result = await stripe.retrievePaymentIntent(clientSecret);
+      console.log("retrievePaymentIntent result:", {
+        hasError: !!result.error,
+        hasPaymentIntent: !!result.paymentIntent,
+        status: result.paymentIntent?.status,
+      });
+      if (result.error) {
+        throw result.error;
+      }
 
-      const { paymentIntent } = await stripe.retrievePaymentIntent(
-        clientSecret
-      );
-      if (!paymentIntent) {
+      if (!result.paymentIntent) {
         throw new Error("No payment intent found");
       }
 
-      return paymentIntent;
+      return result.paymentIntent;
     } catch (error) {
       console.error("Error retrieving payment intent:", error);
       throw error;

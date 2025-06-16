@@ -20,6 +20,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { Product } from "@/types/products-module";
 import { StripeCheckout } from "./stripe-checkout";
 import { SimpleCheckout } from "./simple-checkout";
+import { OrderItemDto } from "@/types/orders-module";
 
 interface TicketSelectionProps {
   product: Product | null;
@@ -54,7 +55,8 @@ export default function TicketSelection({ product }: TicketSelectionProps) {
       totalTickets += quantity;
     });
 
-    const serviceFee = subtotal > 0 ? subtotal * 0.15 : 0;
+    // const serviceFee = subtotal > 0 ? subtotal * 0.15 : 0;
+    const serviceFee = 0;
     const total = subtotal + serviceFee;
 
     return { subtotal, serviceFee, total, totalTickets };
@@ -69,36 +71,30 @@ export default function TicketSelection({ product }: TicketSelectionProps) {
   };
 
   if (showCheckout) {
-    // if (process.env.NEXT_PUBLIC_ENABLE_STRIPE_PAYMENT === "true") {
-    //   console.log(
-    //     "TRUE - ENABLE_STRIPE_PAYMENT:",
-    //     process.env.NEXT_PUBLIC_ENABLE_STRIPE_PAYMENT
-    //   );
-    //   return (
-    //     <StripeCheckout
-    //       productId={product?.id || ""}
-    //       orderItems={product?.productItems.map((option) => ({
-    //         id: option.id,
-    //         name: option.name,
-    //         quantity: quantities[option.id] || 0,
-    //         unitPrice: option.unitPrice,
-    //       }))}
-    //       subtotal={subtotal}
-    //       serviceFee={serviceFee}
-    //       total={total}
-    //       onBack={() => setShowCheckout(false)}
-    //     />
-    //   );
-    // }
+    const orderItemsDto: OrderItemDto[] =
+      product?.productItems.map((option) => ({
+        id: option.id,
+        name: option.name,
+        quantity: quantities[option.id] || 0,
+        unitPrice: option.unitPrice,
+      })) || [];
+
+    if (process.env.NEXT_PUBLIC_ENABLE_STRIPE_PAYMENT === "true" && total > 0) {
+      return (
+        <StripeCheckout
+          productId={product?.id || ""}
+          orderItems={orderItemsDto}
+          subtotal={subtotal}
+          serviceFee={serviceFee}
+          total={total}
+          onBack={() => setShowCheckout(false)}
+        />
+      );
+    }
     return (
       <SimpleCheckout
         productId={product?.id || ""}
-        orderItems={product?.productItems.map((option) => ({
-          id: option.id,
-          name: option.name,
-          quantity: quantities[option.id] || 0,
-          unitPrice: option.unitPrice,
-        }))}
+        orderItems={orderItemsDto}
         subtotal={subtotal}
         serviceFee={serviceFee}
         total={total}
@@ -107,10 +103,10 @@ export default function TicketSelection({ product }: TicketSelectionProps) {
     );
   }
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 3 }}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Box>
-          <Typography>Get Your Tickets</Typography>
+          <Typography variant="h6">Get Your Tickets</Typography>
         </Box>
 
         {product?.productItems.map((item, index) => (
@@ -222,7 +218,7 @@ export default function TicketSelection({ product }: TicketSelectionProps) {
                   );
                 })}
 
-                {subtotal > 0 && (
+                {/* {subtotal > 0 && (
                   <>
                     <Box
                       sx={{
@@ -237,10 +233,9 @@ export default function TicketSelection({ product }: TicketSelectionProps) {
                         ${serviceFee.toFixed(2)}
                       </Typography>
                     </Box>
-                    <Divider sx={{ my: 1 }} />
                   </>
-                )}
-
+                )} */}
+                <Divider sx={{ my: 1 }} />
                 <Box
                   sx={{
                     display: "flex",

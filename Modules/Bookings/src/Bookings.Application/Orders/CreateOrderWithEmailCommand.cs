@@ -1,35 +1,34 @@
-﻿using Bookings.Domain.Entities;
-using MediatR;
-using Products.Application.Products.Dtos;
-using Products.Application.Products;
-using Bookings.Application.Common.Exceptions;
-using Products.Domain.Entities;
+﻿using Bookings.Application.Common.Exceptions;
 using Bookings.Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Shared.Common.Abstraction;
+using Bookings.Domain.Entities;
 using FluentValidation;
+using MediatR;
+using Products.Application.Products;
+using Products.Application.Products.Dtos;
+using Products.Domain.Entities;
+using Shared.Common.Abstraction;
 using Shared.Common.Exceptions;
 
 namespace Bookings.Application.Orders;
 
-public record CreateOrderWithPaymentCommand(
-    Guid ProductId, 
-    string Email, 
-    string PhoneNumber, 
+public record CreateOrderWithEmailCommand(
+    Guid ProductId,
+    string Email,
+    string PhoneNumber,
     string FirstName,
-    string LastName, 
-    DateTime OrderDate, 
-    List<CreateOrderItem> OrderItems, 
-    string PaymentId) : IRequest<Result<Guid>>;
+    string LastName,
+    List<CreateOrderItem> OrderItems,
+    DateTime OrderDate) : IRequest<Result<Guid>>;
 
-
-public class CreateOrderWithPaymentCommandHandler(
-    IBookingsDbContext bookingsDbContext, 
-    IOrderRepository orderRepository, 
-    ISender mediatr, 
-    IValidator<CreateOrderWithPaymentCommand> validator) : IRequestHandler<CreateOrderWithPaymentCommand, Result<Guid>>
+public class CreateOrderWithEmailCommandHandler(
+    IBookingsDbContext bookingsDbContext,
+    IOrderRepository orderRepository,
+    ITokenService tokenService,
+    IEmailService emailService,
+    ISender mediatr,
+    IValidator<CreateOrderWithEmailCommand> validator) : IRequestHandler<CreateOrderWithEmailCommand, Result<Guid>>
 {
-    public async Task<Result<Guid>> Handle(CreateOrderWithPaymentCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateOrderWithEmailCommand request, CancellationToken cancellationToken)
     {
         var validationResult = validator.Validate(request);
         if (!validationResult.IsValid)
@@ -40,21 +39,6 @@ public class CreateOrderWithPaymentCommandHandler(
         try
         {
             using var transaction = await bookingsDbContext.BeginTransactionAsync(cancellationToken);
-
-            // check whether order for payment already exist
-            var found = await bookingsDbContext.Set<Order>().AsNoTracking().FirstOrDefaultAsync(x => x.PaymentId == request.PaymentId);
-            if (found is not null)
-            {
-                throw new BadRequestException("Order with this payment id already exists");
-            }
-            //try
-            //{
-            //    var found = await mediatr.Send(new GetOrderByPaymentIdQuery(request.PaymentId));
-            //}
-            //catch (NotFoundException)
-            //{
-            //    // Ignore exception if order not found
-            //}
 
             var productResult = await mediatr.Send(new GetProductByIdQuery(request.ProductId));
             if (productResult.IsFailure)
@@ -78,7 +62,6 @@ public class CreateOrderWithPaymentCommandHandler(
             var subTotal = orderItems.Sum(oi => oi.LineTotal);
             var totalAmount = subTotal; // + product.Tax; // TODO: Add tax to order item
 
-            // Create order
             var order = CreateOrder(request, orderId, orderNumber, subTotal, totalAmount);
 
             // Add order to the database
@@ -95,13 +78,24 @@ public class CreateOrderWithPaymentCommandHandler(
 
             // Commit the transaction
             await transaction.CommitAsync(cancellationToken);
-                        
+
+            var token = tokenService.GenerateBookingVerificationToken(order.Id.ToString(), order.Email);
+
+            var url = $"http://localhost:3000/orders/verify?token={token}";
+            var htmlContent = $"<p>Dear {order.FirstName}</p><p>Thank you for requesting ticket(s) for the <b>{product.Name}</b> event." +
+                $"<p>To complete your booking, please proceed with the payment. Make sure to include the reference <code>{product.Code}</code> when making the payment.</p>" +
+                $"<p>Once the payment is successully made, kindly verify your order by clicking the link below:</p>" +
+                $"<a href='{url}'>Verify your order</a>" +
+                $"<p>Regards, <br/>NNZWFS</p>";
+
+            // Send email to the user to verify their email address
+            await emailService.SendEmailAsync(order.Email, "Verify your email address", htmlContent);
             return order.Id;
         }
         catch (Exception e) { throw; }
     }
 
-    private Order CreateOrder(CreateOrderWithPaymentCommand request, Guid orderId, string orderNumber, decimal subTotal, decimal totalAmount)
+    private Order CreateOrder(CreateOrderWithEmailCommand request, Guid orderId, string orderNumber, decimal subTotal, decimal totalAmount)
     {
         return new Order
         {
@@ -115,8 +109,8 @@ public class CreateOrderWithPaymentCommandHandler(
             OrderDate = request.OrderDate,
             SubTotal = subTotal,
             TotalAmount = totalAmount,
-            IsPaid = true,
-            PaymentId = request.PaymentId,
+            IsPaid = false,
+            PaymentId = string.Empty,
         };
     }
 
@@ -135,4 +129,3 @@ public class CreateOrderWithPaymentCommandHandler(
         };
     }
 }
-

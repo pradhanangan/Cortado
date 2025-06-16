@@ -18,10 +18,19 @@ public class MarkOrderAsPaidCommandHandler(IBookingsDbContext bookingsDbContext)
             throw new Exception("Order not found");
         }
 
+        if(!order.IsVerified)
+        {
+            order.IsVerified = true;
+        }
         order.IsPaid = true;
-        order.PaymentId = request.PaymentId; 
-
-        await bookingsDbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        order.PaymentId = request.PaymentId;
+        try
+        {
+            await bookingsDbContext.SaveChangesAsync(cancellationToken);
+            return true;
+        } catch(Exception e)
+        {
+            throw e;
+        }
     }
 }

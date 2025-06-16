@@ -31,6 +31,8 @@ public class CreateModel(ISender mediator) : PageModelBase<CreateModel>
     {
         StartDate = DateOnly.FromDateTime(DateTime.Today);
         EndDate = DateOnly.FromDateTime(DateTime.Today);
+        StartTime = TimeOnly.Parse("08:00 AM"); 
+        EndTime = TimeOnly.Parse("08:00 AM");
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -55,7 +57,7 @@ public class CreateModel(ISender mediator) : PageModelBase<CreateModel>
             await Image.CopyToAsync(memoryStream);
         }
         
-        await mediator.Send(new CreateProductCommand(
+        var productId = await mediator.Send(new CreateProductCommand(
             customerId.Value,
             Code,
             Name,

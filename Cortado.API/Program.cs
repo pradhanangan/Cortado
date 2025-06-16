@@ -148,13 +148,13 @@ builder.Services.AddAuthentication(options =>
      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
      {
          //options.MapInboundClaims = false;
-         options.Authority = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo";
+         options.Authority = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_NQujzkKkC";
          options.TokenValidationParameters = new TokenValidationParameters
          {
              //IssuerSigningKeyResolver = (s, securityToken, identifier, parameters) =>
              //{
              //    // get JsonWebKeySet from AWS 
-             //    var json = new WebClient().DownloadString("https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo/.well-known/jwks.json");
+             //    var json = new WebClient().DownloadString("https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_NQujzkKkC/.well-known/jwks.json");
 
              //    // serialize the result 
              //    var keys = JsonConvert.DeserializeObject<JsonWebKeySet>(json).Keys;
@@ -166,7 +166,7 @@ builder.Services.AddAuthentication(options =>
              ValidateAudience = false,
              ValidateLifetime = true,
              ValidateIssuerSigningKey = true,
-             ValidIssuer = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DDjbonXfo",
+             ValidIssuer = "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_NQujzkKkC",
              NameClaimType = "sub",
              RoleClaimType = "cognito:groups",
              //NameClaimType ="sub"

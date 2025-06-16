@@ -11,7 +11,7 @@ CREATE TABLE orders (
     total_amount NUMERIC NOT NULL, -- Final amount: SubTotal - Discount + Tax
     is_verified BOOLEAN NOT NULL,
     is_paid BOOLEAN NOT NULL,
-    payment_id VARCHAR(20) NOT NULL,
+    payment_id VARCHAR(40) NOT NULL,
     is_confirmed BOOLEAN NOT NULL,
     created_by VARCHAR(40) NOT NULL,
     created_date TIMESTAMP WITH TIME ZONE NOT NULL,
