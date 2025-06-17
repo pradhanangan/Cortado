@@ -1,7 +1,7 @@
 import { API_CONFIG } from "@/config/api-config";
 import { PRODUCT_ERRORS } from "@/constants/product-constant";
-import { ApiProblemDetails, ApiErrorCode } from "@/types/api";
-import { Product } from "@/types/products-module";
+import { ApiProblemDetails, ApiErrorCode } from "@/types/api-type";
+import { Product } from "@/types/product-type";
 
 export class ProductService {
   public static async getProductByToken(token: string): Promise<Product> {

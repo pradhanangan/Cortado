@@ -77,7 +77,6 @@ export function CheckoutForm({
 
     try {
       const orderId = await OrderService.createOrder(order);
-      debugger;
       if (!orderId) {
         setErrorMsg("Failed to create order. Please try again.");
         setIsSubmitting(false);
@@ -86,7 +85,6 @@ export function CheckoutForm({
 
       const returnUrl = encodeURIComponent(window.location.href);
       const timestamp = encryptTimestamp(Date.now());
-      debugger;
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -104,7 +102,6 @@ export function CheckoutForm({
         },
         // redirect: "if_required",
       });
-      debugger;
       if (error) {
         console.error(error);
         setIsSubmitting(false);

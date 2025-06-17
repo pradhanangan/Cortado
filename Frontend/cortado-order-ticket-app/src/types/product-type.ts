@@ -3,6 +3,12 @@ export interface Product {
   code: string;
   name: string;
   description: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  address: string;
+  imageUrl: string;
   productItems: ProductItem[];
 }
 

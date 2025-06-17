@@ -29,7 +29,6 @@ export function useStripePayment() {
         // console.error("Stripe is not initialized");
         // return;
       }
-      debugger;
       const result = await stripe.retrievePaymentIntent(clientSecret);
       console.log("retrievePaymentIntent result:", {
         hasError: !!result.error,

@@ -52,9 +52,9 @@ export default function Home() {
                 }),
               })}
             >
-              Ristretto
+              Cortado
             </Typography>
-            &nbsp;ticket&nbsp;management
+            &nbsp;order&nbsp;ticket
           </Typography>
           <Typography
             sx={{

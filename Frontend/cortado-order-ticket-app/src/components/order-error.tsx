@@ -41,7 +41,7 @@ export default function OrderError({
                     }),
                   })}
                 >
-                  Ristretto
+                  Cortado
                 </Typography> */}
           Oops!
         </Typography>

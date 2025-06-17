@@ -122,7 +122,6 @@ export class OrderService {
     orderId: string,
     paymentIntentId: string
   ): Promise<void> {
-    debugger;
     const response = await fetch(
       `${API_CONFIG.BASE_URL}/orders/${orderId}/mark-as-paid`,
       {
@@ -148,7 +147,6 @@ export class OrderService {
         method: "GET",
       }
     );
-    debugger;
     if (!response.ok) {
       const errorData: ApiProblemDetails = await response.json();
       console.error("Order verification failed: ", errorData);

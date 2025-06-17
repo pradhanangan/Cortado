@@ -12,9 +12,9 @@ export default function Header() {
             component="div"
             sx={{ flexGrow: 1, marginLeft: 1 }}
           >
-            Ristretto
+            Cortado
           </Typography>
-          <Typography variant="caption">Ticket Management</Typography>
+          <Typography variant="caption">Order Ticket</Typography>
         </Toolbar>
       </AppBar>
     </Box>

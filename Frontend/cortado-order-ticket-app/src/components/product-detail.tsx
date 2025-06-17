@@ -8,7 +8,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { Product } from "@/types/product-type";
 import { formatDate, formatTime } from "@/utils/date-utils";
 interface ProductDetailProps {
-  product: Product | null;
+  product: Product;
 }
 export default function ProductDetail({ product }: ProductDetailProps) {
   return (
@@ -18,7 +18,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           <Grid container spacing={3} alignItems="center">
             <Grid size={{ xs: 12, lg: 6 }} order={{ xs: 1, lg: 1 }}>
               <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
-                {product?.name}
+                {product.name}
               </Typography>
               <Typography
                 variant="body1"
@@ -28,7 +28,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   color: "text.secondary",
                 }}
               >
-                {product?.description}
+                {product.description}
               </Typography>
               <Box
                 sx={{
@@ -44,22 +44,22 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   sx={{ display: "flex", alignItems: "center", gap: 1 }}
                 >
                   <CalendarMonthIcon fontSize="small" />
-                  {formatDate(product?.startDate, "en-GB")}
+                  {formatDate(product.startDate, "en-GB")}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{ display: "flex", alignItems: "center", gap: 1 }}
                 >
                   <ScheduleIcon fontSize="small" />
-                  Gates open at {formatTime(product?.startTime)}, Event ends at{" "}
-                  {formatTime(product?.endTime)}
+                  Gates open at {formatTime(product.startTime)}, Event ends at{" "}
+                  {formatTime(product.endTime)}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{ display: "flex", alignItems: "center", gap: 1 }}
                 >
                   <LocationOnIcon fontSize="small" />
-                  {product?.address}
+                  {product.address}
                 </Typography>
               </Box>
             </Grid>
@@ -76,7 +76,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 }}
               >
                 <Image
-                  src={product?.imageUrl || "https://picsum.photos/400/200"}
+                  src={product.imageUrl || "https://picsum.photos/400/200"}
                   alt="Summer Music Festival"
                   fill
                   style={{ objectFit: "cover" }}
