@@ -7,7 +7,7 @@ using Products.Application.ProductItems;
 namespace Cortado.API.Pages.Admin.ProductItems
 {
     [Authorize]
-    public class CreateModel(ISender mediator) : PageModel
+    public class CreateModel(ISender mediator) : PageModelBase<CreateModel>
     {
         [BindProperty]
         public Guid ProductId { get; set; }
@@ -17,6 +17,9 @@ namespace Cortado.API.Pages.Admin.ProductItems
         public string Description { get; set; } = string.Empty;
         [BindProperty]
         public string Variants { get; set; } = string.Empty;
+        [BindProperty]
+        public bool IsFree { get; set; }
+
         [BindProperty]
         public decimal UnitPrice { get; set; } = 0;
 
@@ -32,7 +35,8 @@ namespace Cortado.API.Pages.Admin.ProductItems
                 return Page();
 
             }
-            await mediator.Send(new CreateProductItemCommand(ProductId, Name, Description, Variants, UnitPrice));
+
+            await mediator.Send(new CreateProductItemCommand(ProductId, Name, Description, Variants, IsFree, UnitPrice));
             return RedirectToPage("/Admin/Products/Edit", new { id = ProductId } );
         }
     }

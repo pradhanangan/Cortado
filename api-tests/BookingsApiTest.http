@@ -1,0 +1,18 @@
+@hostname=localhost
+@port=7159
+
+POST https://{{hostname}}:{{port}}/api/Orders
+Content-Type: application/json
+
+{
+  "productId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "email": "john@doe.com",
+  "phoneNumber": "string",
+  "firstName": "string",
+  "lastName": "string",
+  "orderDate": "2025-05-12T06:19:01.189Z",
+  "orderItems": []
+}
+
+
+###

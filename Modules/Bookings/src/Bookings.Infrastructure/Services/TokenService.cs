@@ -61,7 +61,7 @@ public class TokenService : ITokenService
             var email = principal.FindFirst("Email")?.Value;
             if (string.IsNullOrEmpty(bookingId) || string.IsNullOrEmpty(email))
             {
-                throw new Exception("Email or BookingId claim is missing");
+                throw new MissingClaimException("BookingId or Email");
             }
                 
             return (bookingId, email);

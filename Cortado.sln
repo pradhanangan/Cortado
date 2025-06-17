@@ -10,14 +10,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{6978DE6B-0BEE-4D86-B42D-A4F6E418C146}"
 	ProjectSection(SolutionItems) = preProject
-		sql\BookingModule.sql = sql\BookingModule.sql
-		sql\CustomerModule.sql = sql\CustomerModule.sql
-		sql\init.sql = sql\init.sql
-		sql\ProductModule.sql = sql\ProductModule.sql
+		sql\00_DropAll.sql = sql\00_DropAll.sql
+		sql\01_CustomerModule.sql = sql\01_CustomerModule.sql
+		sql\02_ProductModule.sql = sql\02_ProductModule.sql
+		sql\03_BookingModule.sql = sql\03_BookingModule.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api-tests", "api-tests", "{8F860659-CBA2-4480-B63F-1D8D7E2EB612}"
 	ProjectSection(SolutionItems) = preProject
+		api-tests\BookingsApiTest.http = api-tests\BookingsApiTest.http
 		api-tests\IdentitiesApiTest.http = api-tests\IdentitiesApiTest.http
 		api-tests\MembersApiTest.http = api-tests\MembersApiTest.http
 		api-tests\UsersApiTest.http = api-tests\UsersApiTest.http
@@ -64,6 +65,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B84BA6AD-E3C6-4C69-9FBC-9912657C5531}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Common", "Modules\Shared\src\Shared.Common\Shared.Common.csproj", "{FC58F210-347E-4132-B5E3-4F396F14238D}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +122,10 @@ Global
 		{FC58F210-347E-4132-B5E3-4F396F14238D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC58F210-347E-4132-B5E3-4F396F14238D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC58F210-347E-4132-B5E3-4F396F14238D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

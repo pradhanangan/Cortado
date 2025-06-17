@@ -1,18 +1,47 @@
-version: "3.8"
 services:
+  cortado-api:
+    image: ${DOCKER_REGISTRY-}cortadoapi
+    container_name: Cortado.App
+    build:
+      context: .
+      dockerfile: Cortado.API/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=cortado-db;Port=5432;Username=postgres;Password=postgres;Database=Cortado.App.Db
+    depends_on:
+      - cortado-db
+  
   cortado-db:
     image: postgres:latest
-    container_name: cortado-db
+    container_name: Cortado.Db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: Cortado.App.Db
     ports:
       - "54321:5432"
+    volumes:
+      - C:/temp/postgres-data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
 
-  cortado-api:
-    build:
-      context: .
-      dockerfile: Cortado.API/Dockerfile
+  cortado-seq:
+    image: datalust/seq:latest
+    container_name: Cortado.Seq
+    environment:
+      - ACCEPT_EULA=Y
     ports:
-      - "5000:8080"
+      - 53411:5341
+      - 8081:80
+
+  cortado-dashboard: 
+    image: mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest
+    container_name: Cortado.Dashboard
+    ports:
+      - 18888:18888
+      - 18889:18889 # OTLP/gRPC
+      - 18890:18890 # OTLP/HTTP
+
+  
+  

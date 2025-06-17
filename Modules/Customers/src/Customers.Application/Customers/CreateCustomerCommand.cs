@@ -1,7 +1,7 @@
 ﻿using Customers.Application.Common.Interfaces;
-using Customers.Domain.Common;
 using Customers.Domain.Entities;
 using MediatR;
+using Shared.Common.Abstraction;
 
 namespace Customers.Application.Customers;
 

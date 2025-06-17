@@ -111,6 +111,7 @@ namespace Cortado.API.Pages.Auth
                     {
                         new Claim(ClaimTypes.Name, Input.Username),
                         new Claim(ClaimTypes.Email, Input.Username),
+
                         new Claim("sub", sub),
                         new Claim("IdToken", idToken),
                         new Claim("AccessToken", accessToken)
@@ -119,8 +120,8 @@ namespace Cortado.API.Pages.Auth
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var principal = new ClaimsPrincipal(identity);
 
-                    //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                    await HttpContext.SignInAsync("MyCookieAuth", principal);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                //await HttpContext.SignInAsync("MyCookieAuth", principal);
 
                     return true;
                 //}

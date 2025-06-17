@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Products.Application.Common.Interfaces;
 using Products.Infrastructure.Persistance;
+using Products.Infrastructure.Services;
 
 namespace Products.Infrastructure;
 
@@ -16,9 +17,10 @@ public static class ConfigureServices
             options.UseNpgsql(connectionString)
                 .UseSnakeCaseNamingConvention();
         });
-
-        //services.AddScoped<IProductDbContext, ProductDbContext>();
+        
         services.AddScoped<IProductDbContext>(provider => provider.GetService<ProductDbContext>());
+
+        services.AddScoped<IProductTokenService, ProductTokenService>();
         return services;
     }
 }

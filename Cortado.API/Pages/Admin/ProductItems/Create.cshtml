@@ -6,8 +6,7 @@
 <h5>Product Items > Create</h5>
 <br />
 <form method="post">
-<div class="row">
-    
+    <div class="row">
         <div class="col-md-4">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ProductId" />
@@ -16,7 +15,7 @@
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            </div>
+        </div>
         <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="Variants" class="form-label"></label>
@@ -24,17 +23,27 @@
                 <span asp-validation-for="Variants" class="text-danger"></span>
             </div>
          </div>
-         </div>
-        <div class="row">
+    </div>
+    <div class="row">
         <div class="col-md-8">
             <div class="form-group">
                 <label asp-for="Description" class="form-label"></label>
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            </div>
-            </div>
+        </div>
+    </div>
+
     <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <div class="form-check">
+                    <input asp-for="IsFree" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsFree" class="form-check-label"></label>
+                    <span asp-validation-for="IsFree" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
         <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="UnitPrice" class="form-label"></label>
@@ -42,11 +51,10 @@
                 <span asp-validation-for="UnitPrice" class="text-danger"></span>
             </div>
         </div>
-        </div>
+    </div>
     <div class="row">
         <div class="form-group mt-2">
             <input type="submit" value="Save" class="btn btn-primary" />
         </div>
-    
-</div>
+    </div>
 </form>

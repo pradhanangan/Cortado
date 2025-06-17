@@ -3,15 +3,16 @@ using Bookings.Application.Common.Exceptions;
 using Bookings.Application.Common.Interfaces;
 using Bookings.Domain.Entities;
 using MediatR;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Orders;
 
-public sealed record class VerifyOrderCommand(string Token) : IRequest<VerifyOrderResponse>;
+public sealed record class VerifyOrderCommand(string Token) : IRequest<Result<VerifyOrderResponse>>;
 public sealed record class VerifyOrderResponse(string Status);
 
-public class VerifyOrderCommandHandler(IBookingsDbContext bookingDbContext, ITokenService tokenService) : IRequestHandler<VerifyOrderCommand, VerifyOrderResponse>
+public class VerifyOrderCommandHandler(IBookingsDbContext bookingDbContext, ITokenService tokenService) : IRequestHandler<VerifyOrderCommand, Result<VerifyOrderResponse>>
 {
-    public async Task<VerifyOrderResponse> Handle(VerifyOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result<VerifyOrderResponse>> Handle(VerifyOrderCommand request, CancellationToken cancellationToken)
     {
         (string orderId, string email) = ("", "");
         try
@@ -19,10 +20,16 @@ public class VerifyOrderCommandHandler(IBookingsDbContext bookingDbContext, ITok
             (orderId, email) = tokenService.ValidateBookingVerificationToken(request.Token);
         }
         catch (Exception ex)
-        //when (ex is TokenExpiredException)
         {
-            throw;
-            //return new VerifyBookingResponse(VerifyBookingStatus.TokenExpired);
+            switch (ex)
+            {
+                case TokenExpiredException:
+                    return new VerifyOrderResponse(VerifyBookingStatus.TokenExpired);
+                case MissingClaimException:
+                    return Result.Failure<VerifyOrderResponse>(new Error("Token.MissingClaim", "The token is missing the required claim `BookingId or Email`"));
+                default:
+                    return Result.Failure<VerifyOrderResponse>(new Error("Token.UnknownError", "An unknown error occurred while validating the token."));
+            }
         }
 
         var order = bookingDbContext.Set<Order>().Single(b => b.Id == Guid.Parse(orderId));
@@ -34,11 +41,10 @@ public class VerifyOrderCommandHandler(IBookingsDbContext bookingDbContext, ITok
 
         if (order.IsVerified == true)
         {
-            //throw new BadRequestException("Email already verified");
             return new VerifyOrderResponse(VerifyBookingStatus.AlreadyVerified);
         }
 
-       order.IsVerified = true;
+        order.IsVerified = true;
         await bookingDbContext.SaveChangesAsync(cancellationToken);
 
         return new VerifyOrderResponse(VerifyBookingStatus.Verified);

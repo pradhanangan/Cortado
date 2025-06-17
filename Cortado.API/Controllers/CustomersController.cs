@@ -7,7 +7,7 @@ namespace Cortado.API.Controllers;
 
 [Route("api/customers")]
 [ApiController]
-public class CustomersController : ApiControllerBase
+public class CustomersController : ApiControllerBase<CustomersController>
 {
     [HttpGet]
     public async Task<IEnumerable<CustomerDto>> Get()

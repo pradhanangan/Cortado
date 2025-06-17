@@ -34,6 +34,15 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label asp-for="Product.Address" class="form-label"></label>
+                <textarea asp-for="Product.Address" class="form-control" readonly></textarea>
+                <span asp-validation-for="Product.Address" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="Product.StartDate" class="form-label"></label>
@@ -50,9 +59,66 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Product.StartTime" class="form-label"></label>
+                <input asp-for="Product.StartTime" type="time" class="form-control" readonly />
+                <span asp-validation-for="Product.StartTime" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Product.EndTime" class="form-label"></label>
+                <input asp-for="Product.EndTime" type="time" class="form-control" readonly />
+                <span asp-validation-for="Product.EndTime" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label asp-for="Product.ImageUrl" class="form-label"></label>
+                <input asp-for="Product.ImageUrl" type="file" class="form-control" readonly />
+                <span asp-validation-for="Product.ImageUrl" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label class="form-label">@Model.Product.ImageUrl</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+               @*  <label>Current Image</label> *@
+                @if (!string.IsNullOrEmpty(Model.Product.ImageUrl))
+                {
+                    <img src="@Model.Product.ImageUrl" alt="Product Image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />
+                }
+                else
+                {
+                    <p>No image available.</p>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
         @* <div class="form-group mt-2">
             <input type="submit" value="Save" class="btn btn-primary" />
         </div> *@
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label asp-for="Product.RegistrationUrl" class="form-label"></label>
+                @* <label class="form-label">@Model.Product.RegistrationUrl</label> *@
+                <input asp-for="Product.RegistrationUrl" class="form-control" readonly />
+                
+            </div>
+        </div>
     </div>
 </form>
 <br/>

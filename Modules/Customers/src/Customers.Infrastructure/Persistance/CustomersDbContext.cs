@@ -1,7 +1,7 @@
 ﻿using Customers.Application.Common.Interfaces;
-using Customers.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Shared.Common.Abstraction;
 
 namespace Customers.Infrastructure.Persistance;
 

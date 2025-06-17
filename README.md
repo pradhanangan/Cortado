@@ -125,3 +125,63 @@ public GetMembersQueryHandler(ILogger<GetMembersQueryHandler> logger)
 **Access Seq**
 
 1. Type `http://localhost:5342`, ports are mapped in docker-compose.
+
+
+### Patterns
+Result Type/Pattern
+
+
+### Application Layer
+MediatR
+Microsoft.Extensions.Configuration.Abstractions
+
+
+
+### Validation using FluentValidation
+**Nuget package**
+
+`PM>dotnet add package FluentValidation.DependencyInjectionExtensions`
+
+**DI** 
+```
+// Register FluentValidation
+services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+```
+
+**Validators**
+- Class should implement AbstractValidator<T> where T is the command or query class. e.g. CreateOrderCommandValidator
+```
+public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
+{
+    public CreateOrderCommandValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .EmailAddress()
+            .WithMessage("Customer ID is required.");
+    }
+}
+```
+
+**CommandHandler**
+```
+public class CreateOrderCommandHandler(..., IValidator<CreateOrderCommand> validator) : IRequestHandler<CreateOrderCommand, Result<Guid>>
+{
+        var validationResult = validator.Validate(request);
+        if (!validationResult.IsValid)
+        {
+            throw new RequestValidationException(validationResult.Errors);
+        }
+        ...
+        ...
+}
+```
+
+### How to publish to aws beanstalk from visual studio
+1. AWS Toolkit for Visual Studio installed.
+2. Right click on project and select Publish to AWS...
+3. Select AWS Elastic Beanstalk        
+4. Set following settings \
+    - Under **Project Build** \
+      - Dotnet Publish Args: -r linux-x64 \
+      - Self Contained Build: Checked

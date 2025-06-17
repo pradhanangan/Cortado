@@ -10,12 +10,14 @@ public class CognitoUserManagement : IUserManagement
 {
     private readonly AmazonCognitoIdentityProviderClient _cognitoIdentityProviderClient;
     private readonly CognitoSettings _cognitoSettings;
-    
-    public CognitoUserManagement(IOptions<CognitoSettings> options)
-    {
-        _cognitoSettings = options.Value;
+    private readonly AwsSettings _awsSettings;
 
-        BasicAWSCredentials awsCredentials = new (_cognitoSettings.AwsAccessKey, _cognitoSettings.AwsSecretKey);
+    public CognitoUserManagement(IOptions<AwsSettings> awsOptions, IOptions<CognitoSettings> cognitoOptions)
+    {
+        _awsSettings = awsOptions.Value;
+        _cognitoSettings = cognitoOptions.Value;
+
+        BasicAWSCredentials awsCredentials = new (_awsSettings.AccessKey, _awsSettings.SecretKey);
         _cognitoIdentityProviderClient = new AmazonCognitoIdentityProviderClient(awsCredentials, RegionEndpoint.APSoutheast2);
     }
 

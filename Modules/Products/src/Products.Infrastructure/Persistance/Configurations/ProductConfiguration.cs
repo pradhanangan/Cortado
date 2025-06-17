@@ -12,5 +12,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasMany(p => p.ProductItems)
            .WithOne()
            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasIndex(p => new { p.CustomerId, p.Code }).IsUnique();
     }
 }

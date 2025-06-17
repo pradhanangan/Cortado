@@ -5,15 +5,16 @@ using Bookings.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Products.Application.Products;
+using Shared.Common.Abstraction;
 using System.Text;
 
 namespace Bookings.Application.Tickets;
 
-public sealed record CreateTicketCommand(Guid OrderId) : IRequest<List<Guid>>;
+public sealed record CreateTicketCommand(Guid OrderId) : IRequest<Result<List<Guid>>>;
 
-public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQrCodeService qrCodeService, IEmailService emailService, ITicketRepository ticketRepository, ISender medaitr) : IRequestHandler<CreateTicketCommand, List<Guid>>
+public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQrCodeService qrCodeService, IEmailService emailService, ITicketRepository ticketRepository, ISender medaitr) : IRequestHandler<CreateTicketCommand, Result<List<Guid>>>
 {
-    public async Task<List<Guid>> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
+    public async Task<Result<List<Guid>>> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
     {
         var order = await bookingDbContext.Set<Order>().
             Include(o => o.OrderItems).SingleOrDefaultAsync(b => b.Id == request.OrderId);
@@ -23,8 +24,14 @@ public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQr
             throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
-        var product = await medaitr.Send(new GetProductByIdQuery(order.ProductId));
-        
+        var productResult = await medaitr.Send(new GetProductByIdQuery(order.ProductId));
+        if(productResult.IsFailure)
+        {
+            throw new NotFoundException("Product", order.ProductId);
+        }
+
+        var product = productResult.Value;
+
         using var transaction = await bookingDbContext.BeginTransactionAsync(cancellationToken);
         var tickets = new List<Ticket>();
 
@@ -45,7 +52,7 @@ public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQr
                     OrderItemId = orderItem.Id,
                     TicketNumber = ticketNumber,
                     IsUsed = false,
-                    Price = orderItem.Price,
+                    Price = orderItem.UnitPrice,
                     Status = "Active",
                     QrCode = qrCode
                 };
@@ -96,7 +103,8 @@ public class CreateTicketCommandHandler(IBookingsDbContext bookingDbContext, IQr
         {
 
             await emailService.SendEmailAsync(order.Email, $"Tickets for {product.Code}", htmlBody.ToString(), inlineImages);
-        } catch(Exception e)
+        }
+        catch (Exception e)
         {
 
         }

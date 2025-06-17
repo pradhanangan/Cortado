@@ -1,4 +1,4 @@
-﻿using Customers.Domain.Common;
+﻿using Shared.Common.Abstraction;
 
 namespace Customers.Domain.Entities;
 

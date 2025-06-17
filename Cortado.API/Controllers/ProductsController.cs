@@ -1,60 +1,114 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Products.Application.Products;
-using Products.Application.ProductItems;
-using Products.Application.Products.Dtos;
-using Cortado.API.Contracts;
-using Microsoft.AspNetCore.Authorization;
+﻿using Cortado.API.Contracts;
+using Cortado.API.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Products.Application.ProductItems;
+using Products.Application.Products;
+using Products.Application.Products.Dtos;
 
 namespace Cortado.API.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme + "," + CookieAuthenticationDefaults.AuthenticationScheme)]
     [Route("api/products")]
     [ApiController]
-    public class ProductsController : ApiControllerBase
+    public class ProductsController: ApiControllerBase<ProductsController>
     {
         [AllowAnonymous]
-        [HttpGet]
-        public async Task<IEnumerable<ProductDto>> Get()
+        [HttpGet("token")]
+        public async Task<ActionResult<ProductDto>> GetProductByToken([FromQuery] string token)
         {
-            return await Mediator.Send(new GetProductsQuery());
+            var result = await Mediator.Send(new GetProductByTokenQuery(token));
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ToProblemDetails());
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> Get()
+        {
+            Logger.LogInformation("{Controller} called", nameof(ProductsController));
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+            var products = await Mediator.Send(new GetProductsQuery(customerId.Value));
+            return Ok(products.Value);
         }
 
         [HttpGet("{id}")]
-        public async Task<ProductDto> Get(Guid id)
+        public async Task<ActionResult<ProductDto>> Get(Guid id)
         {
-           return await Mediator.Send(new GetProductByIdQuery(id));
+            var result = await Mediator.Send(new GetProductByIdQuery(id));
+            return result.Value;
+        }
+        
+        [HttpGet("code")]
+        public async Task<ActionResult<ProductDto>> GetProductByCode([FromQuery] string code)
+        {
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+
+            var result = await Mediator.Send(new GetProductByCodeQuery(customerId.Value, code));
+            return result.Value;
         }
 
-        [HttpGet("code")]
-        public async Task<ProductDto> GetProductByCode([FromQuery] string code)
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> SearchProductsByCode([FromQuery] string code)
         {
-            return await Mediator.Send(new GetProductByCodeQuery(code));
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+
+            var result = await Mediator.Send(new SearchProductsByCodeQuery(customerId.Value, code));
+            return result.Value;
         }
 
         [HttpPost]
-        public async Task<Guid> Post(CreateProductRequest request)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<Guid>> Post([FromForm] CreateProductRequest request)
         {
-            return await Mediator.Send(new CreateProductCommand(
+            var customerId = await GetCustomerIdAsync();
+            if (customerId == null)
+            {
+                return Unauthorized("Customer not found.");
+            }
+            
+            using var imgStream = request.Image.OpenReadStream();
+            var result = await Mediator.Send(new CreateProductCommand(
+                customerId.Value,
                 request.Code,
                 request.Name,
                 request.Description,
+                imgStream,
+                request.Image.FileName,
+                request.Address,
                 request.StartDate,
-                request.EndDate
+                request.EndDate,
+                request.StartTime,
+                request.EndTime
             ));
+            return result.IsSuccess ? CreatedAtAction(nameof(Post), result.Value) : BadRequest(result.ToProblemDetails());
         }
 
         [HttpPost]
         [Route("/api/products/{productId:guid}/product-items")]
-        public async Task<Guid> CreateProductItem(Guid productId, CreateProductItemRequest request)
+        public async Task<ActionResult<Guid>> CreateProductItem(Guid productId, CreateProductItemRequest request)
         {
-            return await Mediator.Send(new CreateProductItemCommand(
+            var result = await Mediator.Send(new CreateProductItemCommand(
                 request.ProductId,
                 request.Name,
                 request.Description,
                 request.Variants,
+                request.IsFree,
                 request.UnitPrice
             ));
+            return result.IsSuccess ? CreatedAtAction(nameof(Post), result.Value) : BadRequest(result.ToProblemDetails());
         }
     }
 }

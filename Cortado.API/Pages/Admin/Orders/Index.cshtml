@@ -3,11 +3,27 @@
 @{
 }
 <h5>Orders</h5>
-<br />
 <form method="get">
-    <label for="productCode">Product code:</label>
-    <input type="text" name="productCode" value="@Model.ProductCode" placeholder="Search product code..." class="form-control" />
-    <button type="submit" class="btn btn-primary">Search</button>
+    <div class="d-flex align-items-start" style="gap: 0.5rem">
+        <label for="productCode" class="me-2">Product code:</label>
+
+        <div style="position: relative; flex-grow: 1">
+            <input type="text"
+                   name="productCode"
+                   id="productCode"
+                   value="@Model.ProductCode"
+                   placeholder="Search product code..."
+                   class="form-control"
+                   autocomplete="off" />
+
+            <ul id="productCodeSuggestions"
+                class="dropdown-menu show"
+                style="display: none; width: 100%; top: 100%; left: 0; z-index: 1000; position: absolute;">
+            </ul>
+        </div>
+
+        <button type="submit" class="btn btn-primary ms-2">Search</button>
+    </div>
 </form>
 <table class="table table-striped">
     <thead>
@@ -15,11 +31,8 @@
             <th>
                 Email
             </th>
-            @* <th>
-                Phone number
-            </th> *@
             <th>
-                Num Tickets
+                Num tickets
             </th>
             <th>
                 Order date
@@ -44,10 +57,6 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
-                @* <td>
-                    @Html.DisplayFor(modelItem => item.PhoneNumber)
-                </td> *@
-                
                 <td>
                    @Html.DisplayFor(modelItem => item.TotalNumberOfTickets)
                 </td>
@@ -55,7 +64,7 @@
                     @Html.DisplayFor(modelItem => item.OrderDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IsEmailVerified)
+                    @Html.DisplayFor(modelItem => item.IsVerified)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.IsPaid)
@@ -65,10 +74,66 @@
                 </td>
                 <td>@* @(item.Tickets != null && item.Tickets.Any() ? "Yes" : "No") *@</td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
+                   
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+
+@section Scripts {
+    <script>
+                function getCookie(name) {
+                    console.log("cookies: ", document.cookie);
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            const productCodeInput = document.getElementById("productCode");
+            const suggestionsList = document.getElementById("productCodeSuggestions");
+           
+            productCodeInput.addEventListener("input", function () {
+                const query = productCodeInput.value;
+
+                if (query.length < 2) {
+                    suggestionsList.style.display = "none";
+                    return;
+                }
+                // Retrieve the token from the cookie
+                debugger;
+        const token = getCookie("accessToken");
+                fetch(`/api/products/search?code=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        debugger;
+                        suggestionsList.innerHTML = ""; // Clear previous suggestions
+                        if (data.length > 0) {
+                            suggestionsList.style.display = "block";
+                            data.forEach(item => {
+                                const li = document.createElement("li");
+                                li.textContent = item.code; // Assuming ProductDto has a `code` property
+                                li.classList.add("dropdown-item");
+                                li.addEventListener("click", () => {
+                                    productCodeInput.value = item.code;
+                                    suggestionsList.style.display = "none";
+                                });
+                                suggestionsList.appendChild(li);
+                            });
+                        } else {
+                            suggestionsList.style.display = "none";
+                        }
+                    })
+                    .catch(error => console.error("Error fetching product codes:", error));
+            });
+
+            document.addEventListener("click", function (event) {
+                if (!suggestionsList.contains(event.target) && event.target !== productCodeInput) {
+                    suggestionsList.style.display = "none";
+                }
+            });
+        });
+    </script>
+}

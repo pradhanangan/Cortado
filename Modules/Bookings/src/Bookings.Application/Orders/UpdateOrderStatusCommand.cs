@@ -2,14 +2,15 @@
 using Bookings.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Common.Abstraction;
 
 namespace Bookings.Application.Orders;
 
-public sealed record UpdateOrderStatusCommand(Guid OrderId, string PaymentId, bool IsPaid, bool IsConfirmed) : IRequest<Unit>;
+public sealed record UpdateOrderStatusCommand(Guid OrderId, string PaymentId, bool IsPaid, bool IsConfirmed) : IRequest<Result<Unit>>;
 
-public class UpdateOrderStatusCommandHandler(IBookingsDbContext bookingsDbContext) : IRequestHandler<UpdateOrderStatusCommand, Unit>
+public class UpdateOrderStatusCommandHandler(IBookingsDbContext bookingsDbContext) : IRequestHandler<UpdateOrderStatusCommand, Result<Unit>>
 {
-    public async Task<Unit> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
     {
         var order = await bookingsDbContext.Set<Order>().FirstOrDefaultAsync(o => o.Id == request.OrderId, cancellationToken);
         if (order == null)
