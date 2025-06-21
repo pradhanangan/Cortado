@@ -30,11 +30,7 @@ export function useStripePayment() {
         // return;
       }
       const result = await stripe.retrievePaymentIntent(clientSecret);
-      console.log("retrievePaymentIntent result:", {
-        hasError: !!result.error,
-        hasPaymentIntent: !!result.paymentIntent,
-        status: result.paymentIntent?.status,
-      });
+
       if (result.error) {
         throw result.error;
       }

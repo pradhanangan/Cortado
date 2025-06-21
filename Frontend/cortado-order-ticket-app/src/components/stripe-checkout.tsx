@@ -110,11 +110,6 @@ export function CheckoutForm({
       //   const result = await stripe.retrievePaymentIntent(
       //     paymentIntent.client_secret!
       //   );
-      //   console.log("retrievePaymentIntent result:", {
-      //     hasError: !!result.error,
-      //     hasPaymentIntent: !!result.paymentIntent,
-      //     status: result.paymentIntent?.status,
-      //   });
       //   // Redirect to success page or show success message
       //   window.location.href = `/orders/payments/complete?orderId=${orderId}&productId=${productId}`;
       // } else {
